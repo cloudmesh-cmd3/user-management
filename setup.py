@@ -33,6 +33,29 @@ home = os.path.expanduser("~")
 
 auto_create_version("cloudmesh_management", version)
 
+class SetupYaml(install):
+    """Copies a management yaml file to ~/.cloudmesh."""
+
+    description = __doc__
+
+    def run(self):
+        banner("Setup the cloudmesh management yaml files ")
+
+        yamlfiles = ['country.yaml']
+
+        for yamlfile in yamlfiles:
+            
+            filename = path_expand("~/.cloudmesh/{0}".format(yamlfile))
+
+            if os.path.isfile(filename):
+                print ("ERROR: the file {0} already exists".format(cmd3_yaml))
+                print
+                print ("If you like to reinstall it, please remove the file")
+            else:
+                print ("Copy file:  {0} -> {1} ".format(path_expand("etc/{0}".format(yamlfile), yamlfile))
+                Shell.mkdir("~/.cloudmesh")
+
+            shutil.copy("etc/{0}".format(yamlfile, path_expand("~/.cloudmesh/{0}".format(yamlfile))
 
 class UploadToPypi(install):
     """Upload the package to pypi."""
@@ -105,7 +128,8 @@ setup(
         'requirements': InstallRequirements,
         'all': InstallAll,
         'pypi': UploadToPypi,
-        'pypiregister': RegisterWithPypi,        
+        'pypiregister': RegisterWithPypi,
+        'yaml': SetupYaml,
         },
 )
 
