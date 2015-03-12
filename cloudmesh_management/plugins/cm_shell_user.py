@@ -3,20 +3,20 @@ import os
 from cmd3.console import Console
 from cmd3.shell import command
 
-from cmd3_example.HostStatus import HostStatus
+from cloudmesh_management.UserStatus import UserStatus
 
-class cm_shell_hoststatus:
+class cm_shell_user:
 
-    def activate_cm_shell_hoststatus(self):
-        self.register_command_topic('mycommands', 'hoststatus')
+    def activate_cm_shell_user(self):
+        self.register_command_topic('management', 'user')
 
     @command
-    def do_hoststatus(self, args, arguments):
+    def do_user(self, args, arguments):
         """
         ::
 
           Usage:
-              hoststatus NAME 
+              user NAME
 
           tests via ping if the host ith the give NAME is reachable
 
@@ -36,7 +36,7 @@ class cm_shell_hoststatus:
         else:
             host = arguments["NAME"]
             Console.info("trying to reach {0}".format(host))
-            status = HostStatus.status(host)
+            status = UserStatus.status(host)
             if status:
                 Console.info("machine " + host + " has been found. ok.")
             else:
@@ -46,6 +46,6 @@ class cm_shell_hoststatus:
         pass
 
 if __name__ == '__main__':
-    command = cm_shell_hoststatus()
-    command.do_hoststatus("iu.edu")
-    command.do_hoststatus("iu.edu-wrong")
+    command = cm_shell_user()
+    command.do_user("iu.edu")
+    command.do_user("iu.edu-wrong")

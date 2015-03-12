@@ -25,13 +25,18 @@ try:
 except:
     os.system("pip install cloudmesh_base")
 
-
+from cloudmesh_base.util import banner
+from cloudmesh_base.util import path_expand
+from cloudmesh_base.Shell import Shell
+from cloudmesh_base.util import auto_create_version
+from cloudmesh_base.util import auto_create_requirements
 
 banner("Installing Cloudmesh Base")
 
 home = os.path.expanduser("~")
 
 auto_create_version("cloudmesh_management", version)
+auto_create_requirements(requirements)
 
 class SetupYaml(install):
     """Copies a management yaml file to ~/.cloudmesh."""
@@ -52,10 +57,10 @@ class SetupYaml(install):
                 print
                 print ("If you like to reinstall it, please remove the file")
             else:
-                print ("Copy file:  {0} -> {1} ".format(path_expand("etc/{0}".format(yamlfile), yamlfile))
+                print ("Copy file:  {0} -> {1} ".format(path_expand("etc/{0}".format(yamlfile), yamlfile)))
                 Shell.mkdir("~/.cloudmesh")
 
-            shutil.copy("etc/{0}".format(yamlfile, path_expand("~/.cloudmesh/{0}".format(yamlfile))
+            shutil.copy("etc/{0}".format(yamlfile, path_expand("~/.cloudmesh/{0}".format(yamlfile))))
 
 class UploadToPypi(install):
     """Upload the package to pypi."""

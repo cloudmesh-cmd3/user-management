@@ -1,6 +1,6 @@
 from cloudmesh_base.Shell import Shell
 
-class HostStatus(object):
+class UserStatus(object):
 
     @classmethod
     def status(cls, host):
