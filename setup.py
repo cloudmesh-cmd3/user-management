@@ -18,7 +18,8 @@ requirements = [
     'cloudmesh_database',
     'tabulate',
     'cmd3',
-    'fake-factory'
+    'fake-factory',
+    'cloudmesh_database'
 ]
 
 import os

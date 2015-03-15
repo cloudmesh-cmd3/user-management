@@ -8,18 +8,26 @@ from cloudmesh_management.generate import generate_projects
 import os
  
 class TestGenerate:
- 
+
+    yaml_dir = "~/.cloudmesh_yaml"
+    firstname="gergor"
+
     def setup(self):
         # HEADING()
+        self.db = "hallo"
         pass
     
     def teardown(self):
         # HEADING()
         pass
 
+    def _xyz(self):
+        print("hallo")
+
     def test_generate(self):
         HEADING()
 
+        self._xyz()
         generate_users(10)
         generate_projects(3)    
 
@@ -31,5 +39,4 @@ class TestGenerate:
         projects = Project.objects()
         print projects.count()
         pprint (projects[0])
-
 
