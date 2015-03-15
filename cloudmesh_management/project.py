@@ -5,8 +5,10 @@ from cloudmeshobject import CloudmeshObject
 from mongoengine import *
 from cloudmesh_management.user import User
 
+
 def IMPLEMENT():
     print "IMPLEMENT ME"
+
 
 STATUS = ('pending',
           'approved',
@@ -56,7 +58,6 @@ GRANT_ORG = ('NSF',
              'DoD',
              'NIH',
              'other', 'None')
-
 
 REQUIRED = False
 
@@ -256,7 +257,6 @@ class Project(CloudmeshObject):
 
 
 class Projects(object):
-
     '''
     convenience opbject to manage multiple prpojects
     '''
@@ -340,7 +340,7 @@ class Projects(object):
             return found[0].to_json()
         else:
             return None
-        # User ID or project ID
+            # User ID or project ID
 
     def find_by_category(self, category):
         '''
@@ -385,7 +385,7 @@ class Projects(object):
             proposedid = None
 
             # while not found:
-            #    proposedid = uuid.uuid4()
+            # proposedid = uuid.uuid4()
             #    result = Project.objects(projectid=proposedid)
             #    print "PPPPP", result
             #    found = result.count() > 0

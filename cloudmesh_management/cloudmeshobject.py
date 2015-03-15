@@ -6,10 +6,11 @@ import mongoengine
 
 duration_in_weeks = 24
 
+
 def order(mongo_class, exclude=None, include=None, custom=None, kind=None):
     class_fields = list(mongo_class.__dict__["_fields_ordered"])
     if kind in ['required', 'optional']:
-        required = [k for k,v in mongo_class._fields.iteritems() if v.required]
+        required = [k for k, v in mongo_class._fields.iteritems() if v.required]
         fields = class_fields
         optional = []
         for key in class_fields:
@@ -35,16 +36,18 @@ def order(mongo_class, exclude=None, include=None, custom=None, kind=None):
 
     return fields
 
+
 def html_input_type(object, field):
-    map = {mongoengine.fields.StringField: 'text'}    
+    map = {mongoengine.fields.StringField: 'text'}
     # checkbox
     # textarea
     kind = type(object._fields[field])
     try:
         html_type = map[kind]
-    except Exception,e:
+    except Exception, e:
         print "ERROR: {0} not supported".format(kind)
     return html_type
+
 
 def wtf_type(object, field):
     return True
@@ -53,16 +56,16 @@ def wtf_type(object, field):
 def make_form_list(object, fields, title="Form", format="p", capital=True):
     print title
 
-    if format =="p":
-        line_start="<p>"
-        line_end="</p>"
-        field_start=""
-        field_end=""                        
-    elif format =="table":
-        line_start="<tr>"
-        line_end="</tr>"
-        field_start="<td>"
-        field_end="</td>"                        
+    if format == "p":
+        line_start = "<p>"
+        line_end = "</p>"
+        field_start = ""
+        field_end = ""
+    elif format == "table":
+        line_start = "<tr>"
+        line_end = "</tr>"
+        field_start = "<td>"
+        field_end = "</td>"
 
     labels = {}
     for label in fields:
@@ -79,14 +82,13 @@ def make_form_list(object, fields, title="Form", format="p", capital=True):
                 {field_start} <b>{label}</b> {field_end} 
                 {field_start} <input name="{key}" type="{input_type}"> {field_end} 
             {line_end}'''.format(line_start=line_start,
-                                    line_end=line_end,
-                                    field_start=field_start,
-                                    field_end=field_end,                                   
-                                    key=key,
-                                    label=labels[key],
-                                    input_type=kind)
+                                 line_end=line_end,
+                                 field_start=field_start,
+                                 field_end=field_end,
+                                 key=key,
+                                 label=labels[key],
+                                 input_type=kind)
     return form
-
 
 
 class CloudmeshObject(Document):
@@ -98,10 +100,10 @@ class CloudmeshObject(Document):
     attributes can be added and modified with the set_attribute method
     '''
 
-    active = BooleanField(default = False) 
+    active = BooleanField(default=False)
     date_modified = DateTimeField(default=datetime.datetime.now)
     date_created = DateTimeField()
-    date_approved = None 
+    date_approved = None
     date_deactivated = DateTimeField()
 
     meta = {'allow_inheritance': True}
@@ -115,7 +117,7 @@ class CloudmeshObject(Document):
         :param value: the value
         :type value: String
         '''
-        self._data[attribute] = value 
+        self._data[attribute] = value
 
     def set_from_dict(self, d):
         '''
@@ -126,7 +128,7 @@ class CloudmeshObject(Document):
         '''
         for key in d:
             self.set_attribute(key, d[key])
-        
+
     def fields(self, kind=None):
         '''
         lists the attributes. One can select optional, required and all attributes
@@ -135,29 +137,29 @@ class CloudmeshObject(Document):
         :type kind: String
         '''
         if kind is None or kind in ["all"]:
-            return [k for k,v in self._fields.iteritems()]
+            return [k for k, v in self._fields.iteritems()]
         elif kind in ["optional"]:
-            return [k for k,v in self._fields.iteritems() if not v.required]
+            return [k for k, v in self._fields.iteritems() if not v.required]
         elif kind in ["required"]:
-            return [k for k,v in self._fields.iteritems() if v.required]    
+            return [k for k, v in self._fields.iteritems() if v.required]
 
-    def activate(self, state=True): 
+    def activate(self, state=True):
         '''
         activates the object
         
         :param state: the state. True if active
         :type state: Boolean
         '''
-    	"""activates a user"""
+        """activates a user"""
         self.active = state
 
     def deactivate(self):
         '''
         deactivates an object.         
         '''
-    	self.activate(state=False)
-            
-    def set_date_deactivate(self, weeks=duration_in_weeks): 
+        self.activate(state=False)
+
+    def set_date_deactivate(self, weeks=duration_in_weeks):
         '''
         deactivates the object after some duration specified as parameter.
         
@@ -166,9 +168,9 @@ class CloudmeshObject(Document):
         :param weeks: number of weeks
         :type weeks: integer
         '''
-    	self.date_deactivate = datetime.datetime.now() + datetime.timedelta(weeks=weeks)
-        #self.activate()
-    	return self.date_deactivate
+        self.date_deactivate = datetime.datetime.now() + datetime.timedelta(weeks=weeks)
+        # self.activate()
+        return self.date_deactivate
 
     def save(self, *args, **kwargs):
         '''

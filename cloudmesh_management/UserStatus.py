@@ -1,10 +1,10 @@
 from cloudmesh_base.Shell import Shell
 
-class UserStatus(object):
 
+class UserStatus(object):
     @classmethod
     def status(cls, host):
-        msg = "Unknown host" 
+        msg = "Unknown host"
         try:
             msg = Shell.ping("-c", "1", host)
         except:
