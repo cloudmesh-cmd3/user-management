@@ -4,21 +4,27 @@ version = "1.0"
 
 
 requirements = [
-        'future',
-        'sh',
-        'docopt',
-        'pyaml',
-        'simplejson',
-        'nose',
-        'python-hostlist',
-        'prettytable',
-        'pytimeparse',
-    ]
+    'future',
+    'sh',
+    'docopt',
+    'pyaml',
+    'simplejson',
+    'nose',
+    'python-hostlist',
+    'prettytable',
+    'pytimeparse',
+    'cloudmesh_base',
+    'mongoengine',
+    'cloudmesh_database',
+    'tabulate',
+    'cmd3',
+]
+
+import os
 
 from setuptools import setup, find_packages
 from setuptools.command.install import install
-import glob
-import os
+
 
 try:
     from cloudmesh_base.util import banner
@@ -37,6 +43,7 @@ home = os.path.expanduser("~")
 
 auto_create_version("cloudmesh_management", version)
 auto_create_requirements(requirements)
+
 
 class SetupYaml(install):
     """Copies a management yaml file to ~/.cloudmesh."""
