@@ -9,12 +9,6 @@ import os
  
 class TestGenerate:
  
-    filename = "pbs.db"
-    host = "india"
-    script = """
-    uname -a
-    """
-
     def setup(self):
         # HEADING()
         pass
