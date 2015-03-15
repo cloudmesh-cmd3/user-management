@@ -112,7 +112,7 @@ clean:
 	find . -name "*~" -exec rm {} \;  
 	find . -name "*.pyc" -exec rm {} \;  
 	rm -rf build dist *.egg-info *~ #*
-	cd doc; make clean
+	#cd doc; make clean
 	rm -rf *.egg-info
 	rm -f user.* local.* mongod.lock
 
