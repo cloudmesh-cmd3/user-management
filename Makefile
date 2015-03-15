@@ -14,3 +14,6 @@ clean:
 
 requirements:
 	pip install -r requirements.txt
+
+yaml:
+	cp -r etc/accounts ~/.cloudmesh

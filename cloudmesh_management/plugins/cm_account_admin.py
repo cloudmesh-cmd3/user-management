@@ -10,10 +10,10 @@ from docopt import docopt
 import sys
 
 
-class cm_shell_management:
+class cm_account_admin:
 
-    def activate_cm_shell_management (self):
-        self.register_command_topic('mycommands', 'qstat')
+    def activate_cm_account_admin (self):
+        self.register_command_topic('admin', 'management')
 
     @command
     def do_management(self, args, arguments):
@@ -85,5 +85,5 @@ class cm_shell_management:
     pass
 
 if __name__ == '__main__':
-    cmd_object = cm_shell_management()
+    cmd_object = cm_account_admin()
     cmd_object.do_management()
