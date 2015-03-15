@@ -1,0 +1,14 @@
+future
+sh
+docopt
+pyaml
+simplejson
+nose
+python-hostlist
+prettytable
+pytimeparse
+cloudmesh_base
+mongoengine
+cloudmesh_database
+tabulate
+cmd3
