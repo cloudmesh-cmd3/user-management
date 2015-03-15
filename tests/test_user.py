@@ -5,35 +5,59 @@ from pprint import pprint
 import sys
 
 
-def main():
-    user = Users()
-    disp_fmt = None
-    user_name = None
-    user.list_users(disp_fmt, user_name)
 
-    # # users = Users()
-    # # users.clear()
+class TestUser:
+
+
+    def setup(self):
+        # HEADING()
+        pass
+
+    def teardown(self):
+        # HEADING()
+        pass
+
+    def test_clear(self):
+        HEADING()
+        users = Users()
+        users.clear()
+
+        pprint (User.__dict__.keys())
+
+    def test_list(self):
+        HEADING()
+        user = Users()
+        disp_fmt = None
+        user_name = None
+        user.list_users(disp_fmt, user_name)
+
+    def test_user_Gregor(self):
+        HEADING()
+
+        gregor = User(
+            title = "",
+            firstname = "Gregor",
+            lastname = "von Laszewski",
+            email = "laszewski@gmail.com",
+            username = "gregvon",
+            active = True,
+            password = "none",
+            phone = "1234567890",
+            department = "School of Informatics and Computing",
+            institution = "Indiana University",
+            address = "Bloomington",
+            country = "USA",
+            citizenship = "Germany",
+            bio = "I work at Indiana University Bloomington",
+        )
+
+
+
+    # #
     #
-    # gregor = User(
-    #     title = "",
-    #     firstname = "Hallo",
-    #     lastname = "von Laszewski",
-    #     email = "laszewski@gmail.com",
-    #     username = "gregvon",
-    #     active = True,
-    #     password = "none",
-    #     phone = "6625768900",
-    #     department = "School of Informatics and Computing",
-    #     institution = "Indiana University",
-    #     address = "Bloomington",
-    #     country = "USA",
-    #     citizenship = "Germany",
-    #     bio = "I work at Indiana University Bloomington",
-    #     )
     #
     # print 70 * "="
     # print 70 * "="
-    # pprint (User.__dict__.keys())
     # print 70 * "="
     # pprint (User._db_field_map)
     # print 70 * "="
@@ -137,6 +161,3 @@ def main():
     #
     # #users.find()
     # """
-
-if __name__ == "__main__":
-    main()
