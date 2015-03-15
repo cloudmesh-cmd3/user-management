@@ -2,8 +2,8 @@
 
 from mongoengine import *
 #from other.user_dict import *
-from cloudmesh.management.user import User, Users
-from cloudmesh.management.project import Project, Projects
+from cloudmesh_management.user import User, Users
+from cloudmesh_management.project import Project, Projects
 import sys
 from faker import Factory
 import uuid
