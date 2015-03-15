@@ -24,9 +24,9 @@ class TestGenerate:
         generate_projects(3)    
 
         banner("Find")
-        print users.find()
+        #print users.find()
         banner("Find [0]")
-        print users.find()[0]
+        #print users.find()[0]
 
         projects = Project.objects()
         print projects.count()
