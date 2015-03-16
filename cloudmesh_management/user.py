@@ -1,19 +1,18 @@
-import datetime
-import json
-import sys
-
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_management.cloudmeshobject import CloudmeshObject
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
-from mongoengine import *
 from tabulate import tabulate
+from mongoengine import *
 import yaml
+import datetime
+import json
+import sys
 
-STATUS = ('pending', 'approved', 'blocked', 'denied')
+STATUS = ('pending', 'approved', 'blocked', 'denied','active','suspended')
 
 
-def IMPLEMENT():
+def implement():
     print "IMPLEMENT ME"
 
 
@@ -63,9 +62,9 @@ class User(CloudmeshObject):
     This class is used to represent a Cloudmesh User
     """
 
-    dbname = get_mongo_dbname_from_collection("manage")
-    if dbname:
-        meta = {'db_alias': dbname}
+    db_name = get_mongo_dbname_from_collection("manage")
+    if db_name:
+        meta = {'db_alias': db_name}
     #
     # defer the connection to where the object is instantiated
     # get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
@@ -108,36 +107,37 @@ class User(CloudmeshObject):
 
     message = ListField(StringField())
 
-    def order(self):
+    @classmethod
+    def order(cls):
         """
         Order the attributes to be printed in the display
         method
         """
         try:
             return [
-                ("username", self.username),
-                ("status", self.status),
-                ("title", self.title),
-                ("firstname", self.firstname),
-                ("lastname", self.lastname),
-                ("email", self.email),
-                ("url", self.url),
-                ("citizenship", self.citizenship),
-                ("bio", self.bio),
-                ("password", self.password),
-                ("phone", self.phone),
-                ("projects", self.projects),
-                ("institution", self.institution),
-                ("department", self.department),
-                ("address", self.address),
-                ("country", self.country),
-                ("advisor", self.advisor),
-                ("date_modified", self.date_modified),
-                ("date_created", self.date_created),
-                ("date_approved", self.date_approved),
-                ("date_deactivated", self.date_deactivated),
+                ("username", cls.username),
+                ("status", cls.status),
+                ("title", cls.title),
+                ("firstname", cls.firstname),
+                ("lastname", cls.lastname),
+                ("email", cls.email),
+                ("url", cls.url),
+                ("citizenship", cls.citizenship),
+                ("bio", cls.bio),
+                ("password", cls.password),
+                ("phone", cls.phone),
+                ("projects", cls.projects),
+                ("institution", cls.institution),
+                ("department", cls.department),
+                ("address", cls.address),
+                ("country", cls.country),
+                ("advisor", cls.advisor),
+                ("date_modified", cls.date_modified),
+                ("date_created", cls.date_created),
+                ("date_approved", cls.date_approved),
+                ("date_deactivated", cls.date_deactivated),
             ]
-        except:
+        except Exception, e:
             return None
 
     @classmethod
@@ -156,54 +156,53 @@ class User(CloudmeshObject):
     # db.put({"firname":user.firname,...})
 
     def is_active(self):
-        '''
-        check if the user is active
-        '''
-        """finds if a user is active or not"""
+        """
+        Check if the user is active
+        """
         d1 = datetime.datetime.now()
         return (self.active == True) and (datetime.datetime.now() < self.date_deactivate)
 
     @classmethod
     def set_password(cls, password):
-        '''
-        not implemented
+        """
+        Not implemented
 
         :param password:
         :type password:
-        '''
+        """
         #self.password_hash = generate_password_hash(password)
         pass
 
     @classmethod
     def check_password(cls, password):
-        '''
-        not implemented
+        """
+        Not implemented
 
         :param password:
         :type password:
-        '''
+        """
         # return check_password_hash(self.password_hash, password)
         pass
 
-    def json(self):
-        '''
-        returns a json representation of the object
-        '''
-        """prints the user as a json object"""
+    @classmethod
+    def json(cls):
+        """
+        Returns a json representation of the object
+        """
         d = {}
-        for (field, value) in self.order():
+        for (field, value) in cls.order():
             try:
                 d[field] = value
             except:
                 pass
         return d
 
-    def yaml(self):
-        '''
-        returns the yaml object of the object.
-        '''
-        """prints the user as a json object"""
-        return self.__str__(fields=True, all=True)
+    @classmethod
+    def yaml(cls):
+        """
+        Returns the yaml object of the object.
+        """
+        return cls.__str__(fields=True, all=True)
 
     """
     def __str__(self, fields=False, all=False):
@@ -222,7 +221,7 @@ class User(CloudmeshObject):
 
 class Users(object):
     """
-    convenience object to manage several users
+    Convenience object to manage several users
     """
 
     def __init__(self):
@@ -232,23 +231,23 @@ class Users(object):
         # db = connect('manage', port=port)
         self.users = User.objects()
 
-        dbname = get_mongo_dbname_from_collection("manage")
-        if dbname:
-            meta = {'db_alias': dbname}
+        db_name = get_mongo_dbname_from_collection("manage")
+        if db_name:
+            meta = {'db_alias': db_name}
 
         #         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 
     @classmethod
     def objects(cls):
         """
-        returns the users
+        Returns the users
         """
         return cls.users
 
     @classmethod
     def get_unique_username(cls, proposal):
         """
-        gets a unique username form a proposal. This is achieved whil appending a number at the end. if the
+        Gets a unique username from a proposal. This is achieved while appending a number at the end.
 
         :param proposal: the proposed username
         :type proposal: String
@@ -265,7 +264,7 @@ class Users(object):
     @classmethod
     def add(cls, user):
         """
-        adds a user
+        Adds a user
 
         :param user: the username
         :type user: String
@@ -289,25 +288,72 @@ class Users(object):
             except:
                 print "Oops! Something went wrong while trying to remove a user", sys.exc_info()[0]
         else:
-            print "Error: Please specity the user to be removed"
+            print "Error: Please specify the user to be removed"
 
     @classmethod
-    def amend_user_status(self, user_name=None, status=None):
+    def amend_user_status(cls, user_name=None, status=None):
         if user_name:
             try:
-                user = User.objects(username=user_name)
-                if user:
-                    user.status = status
-                    user.save()
+                current_status = cls.get_user_status(user_name)
+            except:
+                print "Oops! Something went wrong while trying to get user status", sys.exc_info()[0]
+
+            if status == "approved":
+                if current_status in ["pending", "denied"]:
+                    cls.set_user_status(user_name, status)
+                else:
+                    print "Cannot approve user. User not in pending status."
+            elif status == "active":
+                if current_status in ["approved", "suspended", "blocked"]:
+                    cls.set_user_status(user_name, status)
+                else:
+                    print "Cannot activate user. User not in approved or suspended status."
+            elif status == "suspended":
+                if current_status == "active":
+                    cls.set_user_status(user_name, status)
+                else:
+                    print "Cannot suspend user. User not in active status."
+            elif status == "blocked":
+                if current_status == "active":
+                    cls.set_user_status(user_name, status)
+                else:
+                    print "Cannot block user. User not in active status."
+            elif status == "denied":
+                if current_status in ["approved", "pending"]:
+                    cls.set_user_status(user_name, status)
+                else:
+                    print "Cannot deny user. User not in approved or pending status."
+        else:
+            print "Error: Please specify the user to be amended"
+
+    @classmethod
+    def set_user_status(cls, user_name, status):
+        if user_name:
+            try:
+                User.objects(username=user_name).update_one(set__status=status)
             except:
                 print "Oops! Something went wrong while trying to amend user status", sys.exc_info()[0]
         else:
-            print "Error: Please specity the user to be amended"
+            print "Error: Please specify the user to be amended"
+
+
+    @classmethod
+    def get_user_status(cls, user_name):
+        if user_name:
+            try:
+                user = User.objects(username=user_name).only('status')
+                if user:
+                    for entry in user:
+                        return entry.status
+            except:
+                print "Oops! Something went wrong while trying to get user status", sys.exc_info()[0]
+        else:
+            print "Error: Please specify the user to be amended"
 
     @classmethod
     def validate_email(cls, email):
         """
-        verifies if the email of the user is not already in the users.
+        Verifies if the email of the user is not already in the users.
 
         :param user: user object
         :type user: User
@@ -320,7 +366,7 @@ class Users(object):
     @classmethod
     def find(cls, email=None):
         """
-        returns the users based on the given query.
+        Returns the users based on the given query.
         If no email is specified all users are returned.
         If the email is specified we search for the user with the given e-mail.
 
@@ -339,7 +385,7 @@ class Users(object):
     @classmethod
     def find_user(cls, username):
         """
-        returns a user based on the username
+        Returns a user based on the username
 
         :param username:
         :type username:
@@ -348,7 +394,9 @@ class Users(object):
 
     @classmethod
     def clear(cls):
-        """removes all elements form the mongo db that are users"""
+        """
+        Removes all elements form the mongo db that are users
+        """
         for user in User.objects:
             user.delete()
 
@@ -416,7 +464,7 @@ class Users(object):
 
 def verified_email_domain(email):
     """
-    not yet implemented. Returns true if the a-mail is in a specified domain.
+    not yet implemented. Returns true if the e-mail is in a specified domain.
 
     :param email:
     :type email:

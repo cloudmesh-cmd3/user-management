@@ -1,4 +1,3 @@
-from cloudmesh_management import User
 from cloudmesh_management.user import User
 # from management import Account
 # from projects import project_information

@@ -1,42 +1,39 @@
 # generates test users and projects
 
-from mongoengine import *
-# from other.user_dict import *
-from cloudmesh_management.user import User, Users
+from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_management.project import Project, Projects
-import sys
-from faker import Factory
-import uuid
-from pprint import pprint
 
-from cloudmesh.config.cm_config import get_mongo_db, DBConnFactory
+from cloudmesh_management.user import User, Users
+from faker import Factory
+from pprint import pprint
+import uuid
 
 get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 
-
-#----------------------------------------------------------
-#	The generate class generates 10 random users
-#----------------------------------------------------------
+# --------------------------------------------
+# The generate class generates 10 random users
+# --------------------------------------------
 
 users = Users()
 projects = Projects()
 
 
-# http://www.joke2k.net/faker/
+# http://www.joke2k.net/faker
 
 fake = Factory.create()
 
 
 def random_user():
-    '''
-    returns a random user in a dict
-    
+    """
+    Returns a random user in a dict
+
     :rtype: dict
-    '''
+    """
     firstname = fake.first_name()
+    prefix = fake.prefix()
     data = User(
         status="pending",
-        title=fake.prefix(),
+        title=prefix[0],
         firstname=firstname,
         lastname=fake.last_name(),
         email=fake.safe_email(),
@@ -46,22 +43,26 @@ def random_user():
         phone=fake.phone_number(),
         department="IT",
         institution=fake.company(),
+        institutionrole="Graduate Student",
         address=fake.address(),
         country="USA",
         citizenship="US",
         bio=fake.paragraph(),
+        url=fake.url(),
+        advisor=fake.name(),
+        confirm=fake.word(),
     )
     return data
 
 
 def generate_users(n):
-    '''
-    generates n random users in an array containing dicts for users
-    
+    """
+    Generates n random users in an array containing dicts for users
+
     :param n: number of users
     :type n: integer
     :rtype: array of dicts
-    '''
+    """
     users.clear()
     for i in range(0, n):
         data = random_user()
@@ -70,7 +71,8 @@ def generate_users(n):
 
 
 def random_project():
-    """generates a random project
+    """
+    Generates a random project in dict
     
     :rtype: dict
     """
@@ -96,17 +98,16 @@ def random_project():
         resources_provision=['paas']
     )
     return data
-    #projects.add_member("gregvon1", data)
 
 
 def generate_projects(n):
-    '''
-    generates n random projects in an array containing dicts for users
-    
+    """
+    Generates n random projects in an array containing dicts for users
+
     :param n: number of projects
     :type n: integer
     :rtype: array of dicts
-    '''
+    """
     projects.clear()
     for i in range(0, n):
         data = random_project()
@@ -115,9 +116,9 @@ def generate_projects(n):
 
 
 def main():
-    '''
-    a test function to create 10 users and 3 projects
-    '''
+    """
+    Test function to create 10 users and 3 projects
+    """
 
     generate_users(10)
     generate_projects(3)

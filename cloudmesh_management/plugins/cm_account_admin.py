@@ -1,13 +1,10 @@
 from __future__ import print_function
-import os
-from cmd3.console import Console
-from cmd3.shell import command
 
-from cloudmesh_management.generate_classes import project_fields, user_fields
 from cloudmesh_management.generate import generate_users
 from cloudmesh_management.user import Users
-from docopt import docopt
-import sys
+
+from cmd3.console import Console
+from cmd3.shell import command
 
 
 class cm_account_admin:
@@ -17,18 +14,20 @@ class cm_account_admin:
 
     @command
     def do_management(self, args, arguments):
-        """cm-management - Command line option to manage users and projects
+        """management - Command line option to manage users and projects
 
         Usage:
             management user generate [--count=N]
             management user list [USERNAME] [--format=FORMAT]
-            management user clear
             management user add [YAMLFILE]
-            management user delete [USERNAME]
-            management user activate [USERNAME]
-            management user deactivate [USERNAME]
             management user approve [USERNAME]
+            management user activate [USERNAME]
+            management user suspend [USERNAME]
+            management user block [USERNAME]
             management user deny [USERNAME]
+            management user delete [USERNAME]
+            management user clear
+            management user status USERNAME
             management project generate
             management version
 
@@ -55,25 +54,59 @@ class cm_account_admin:
                 if arguments['--count']:
                     count = int(arguments['--count'])
                     generate_users(count)
+                    Console.info(str(count)+" users generated.")
                 else:
                     generate_users(10)
+                    Console.info("10 users generated.")
             elif arguments['user'] and arguments['clear']:
                 user = Users()
                 user.clear()
+                Console.info("Users cleared from the database.")
             elif arguments['user'] and arguments['delete']:
                 if arguments['USERNAME']:
                     user = Users()
                     user.delete_user(arguments['USERNAME'])
+                    Console.info("User "+arguments['USERNAME']+" removed from the database.")
                 else:
-                    Console.info("Error: Please specify a user to be removed")
+                    Console.error("Please specify a user to be removed")
             elif arguments['user'] and arguments['approve']:
                 if arguments['USERNAME']:
                     user = Users()
                     user.amend_user_status(arguments['USERNAME'], status='approved')
+                    Console.info("User "+arguments['USERNAME']+" approved.")
+                else:
+                    Console.error("Please specify a user to be amended")
+            elif arguments['user'] and arguments['activate']:
+                if arguments['USERNAME']:
+                    user = Users()
+                    user.amend_user_status(arguments['USERNAME'], status='active')
+                    Console.info("User "+arguments['USERNAME']+" activated.")
+                else:
+                    Console.error("Please specify a user to be amended")
+            elif arguments['user'] and arguments['suspend']:
+                if arguments['USERNAME']:
+                    user = Users()
+                    user.amend_user_status(arguments['USERNAME'], status='suspended')
+                    Console.info("User "+arguments['USERNAME']+" suspended.")
+                else:
+                    Console.error("Please specify a user to be amended")
+            elif arguments['user'] and arguments['block']:
+                if arguments['USERNAME']:
+                    user = Users()
+                    user.amend_user_status(arguments['USERNAME'], status='blocked')
+                    Console.info("User "+arguments['USERNAME']+" blocked.")
+                else:
+                    Console.error("Please specify a user to be amended")
             elif arguments['user'] and arguments['deny']:
                 if arguments['USERNAME']:
                     user = Users()
                     user.amend_user_status(arguments['USERNAME'], status='denied')
+                    Console.info("User "+arguments['USERNAME']+" denied.")
+                else:
+                    Console.error("Please specify a user to be amended")
+            elif arguments['user'] and arguments['status']:
+                user = Users()
+                Console.info("Status of user "+arguments['USERNAME']+" "+user.get_user_status(arguments['USERNAME']))
             elif arguments['project']:
                 Console.info("Dummy Projects")
             elif arguments['list']:

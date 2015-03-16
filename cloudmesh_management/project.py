@@ -1,12 +1,11 @@
-import uuid
-
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmeshobject import CloudmeshObject
-from mongoengine import *
 from cloudmesh_management.user import User
+from mongoengine import *
+import uuid
 
 
-def IMPLEMENT():
+def implement():
     print "IMPLEMENT ME"
 
 
@@ -206,23 +205,23 @@ class Project(CloudmeshObject):
     # Project.objects(categories__contains='education')
 
     active = BooleanField(required=REQUIRED)
-    projectid = UUIDField()
+    project_id = UUIDField()
 
     status = StringField(choices=STATUS, required=REQUIRED)
     # maybe we do not need active as this may be covered in status
 
     # -------------------------------------------------------------------
-    # Project Comittee: contains all the information about the projects committee
+    # Project Committee: contains all the information about the projects committee
     # -------------------------------------------------------------------
     # comittee = ReferenceField(Committee)
 
-
-
-    # BUG how can we add also arbitray info in case of other, mabe ommit
+    # BUG how can we add also arbitrary info in case of other, maybe omit
     # choices
 
     def to_json(self):
-        """prints the project as a json object"""
+        """
+        prints the project as a json object
+        """
 
         d = {
             "title": self.title,
@@ -249,17 +248,17 @@ class Project(CloudmeshObject):
         return d
 
     def __str__(self):
-        '''
-        printing the object as a string
-        '''
+        """
+        Printing the object as a string
+        """
         d = self.to_json()
         return str(d)
 
 
 class Projects(object):
-    '''
-    convenience opbject to manage multiple prpojects
-    '''
+    """
+    Convenience object to manage multiple projects
+    """
 
     def __init__(self):
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
@@ -267,30 +266,35 @@ class Projects(object):
         self.users = User.objects()
 
     def __str__(self):
-        '''
+        """
         not implemented
-        '''
-        IMPLEMENT()
+        """
+        implement()
 
-    def find(self):
+    @classmethod
+    def find(cls):
         return Project.objects()
 
-    def objects(self):
-        '''
-        returns the projects
-        '''
+    @classmethod
+    def objects(cls):
+        """
+        Returns the projects
+        """
         return Project.objects()
 
-    def save(self, project):
-        '''adds a project to the database but only after it has been verifie
+    @classmethod
+    def save(cls, project):
+        """
+        Adds a project to the database but only after it has been verified
 
         :param project: the project id
         :type project: uuid
-        '''
+        """
         project.save()
 
-    def add_user(self, user_name, project, role):
-        '''
+    @classmethod
+    def add_user(cls, user_name, project, role):
+        """
         Adds a member to the project.
 
         :param role: the role of the user
@@ -299,7 +303,7 @@ class Projects(object):
         :type user_name: String
         :param project: the project id
         :type project: uuid
-        '''
+        """
         """adds members to a particular project"""
         users = User.objects(user_name=user_name)
         if users.count() == 1:
@@ -312,7 +316,8 @@ class Projects(object):
         else:
             print "ERROR: The user `{0}` has not registered with FutureGrid".format(user_name)
 
-    def find_users(self, project, role):
+    @classmethod
+    def find_users(cls, project, role):
         '''returns all the members of a particular project
 
         :param role: the role of the user
@@ -327,7 +332,8 @@ class Projects(object):
         elif role == "lead":
             return project.alumni
 
-    def find_by_id(self, id):
+    @classmethod
+    def find_by_id(cls, id):
         '''
         finds projects by if
 
@@ -342,7 +348,8 @@ class Projects(object):
             return None
             # User ID or project ID
 
-    def find_by_category(self, category):
+    @classmethod
+    def find_by_category(cls, category):
         '''
         find the project by category
 
@@ -356,7 +363,8 @@ class Projects(object):
         else:
             return None
 
-    def find_by_keyword(self, keyword):
+    @classmethod
+    def find_by_keyword(cls, keyword):
         '''
         finds a projects matching a keyword
 
@@ -370,13 +378,14 @@ class Projects(object):
         else:
             return None
 
-    def add(self, project):
-        '''
-        adds a project
+    @classmethod
+    def add(cls, project):
+        """
+        Adds a project
 
         :param project: the username
         :type project: String
-        '''
+        """
         print "PPPPPP", project
         if not project.status:
             project.status = 'pending'
@@ -386,7 +395,7 @@ class Projects(object):
 
             # while not found:
             # proposedid = uuid.uuid4()
-            #    result = Project.objects(projectid=proposedid)
+            # result = Project.objects(projectid=proposedid)
             #    print "PPPPP", result
             #    found = result.count() > 0
             #    print result.count()
@@ -397,7 +406,8 @@ class Projects(object):
         print "UUID", project.projectid
         project.save()
 
-    def clear(self):
+    @classmethod
+    def clear(cls):
         """removes all projects from the database"""
         for project in Project.objects:
             project.delete()
