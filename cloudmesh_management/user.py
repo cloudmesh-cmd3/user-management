@@ -2,6 +2,7 @@ from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_management.cloudmeshobject import CloudmeshObject
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
+from cmd3.console import Console
 from tabulate import tabulate
 from mongoengine import *
 import yaml
@@ -274,7 +275,7 @@ class Users(object):
         if cls.validate_email(user.email):
             user.save()
         else:
-            print "ERROR: a user with the e-mail `{0}` already exists".format(user.email)
+            Console.error("A user with the e-mail `{0}` already exists".format(user.email))
 
     @classmethod
     def delete_user(cls, user_name=None):
@@ -284,11 +285,11 @@ class Users(object):
                 if user:
                     user.delete()
                 else:
-                    print "Error: User with the name '{0}' does not exist.".format(user_name)
+                    Console.error("User with the name '{0}' does not exist.".format(user_name))
             except:
-                print "Oops! Something went wrong while trying to remove a user", sys.exc_info()[0]
+                Console.error("Oops! Something went wrong while trying to remove a user")
         else:
-            print "Error: Please specify the user to be removed"
+            Console.error("Please specify the user to be removed")
 
     @classmethod
     def amend_user_status(cls, user_name=None, status=None):
@@ -296,35 +297,35 @@ class Users(object):
             try:
                 current_status = cls.get_user_status(user_name)
             except:
-                print "Oops! Something went wrong while trying to get user status", sys.exc_info()[0]
+                Console.error("Oops! Something went wrong while trying to get user status")
 
             if status == "approved":
                 if current_status in ["pending", "denied"]:
                     cls.set_user_status(user_name, status)
                 else:
-                    print "Cannot approve user. User not in pending status."
+                    Console.error("Cannot approve user. User not in pending status.")
             elif status == "active":
                 if current_status in ["approved", "suspended", "blocked"]:
                     cls.set_user_status(user_name, status)
                 else:
-                    print "Cannot activate user. User not in approved or suspended status."
+                    Console.error("Cannot activate user. User not in approved or suspended status.")
             elif status == "suspended":
                 if current_status == "active":
                     cls.set_user_status(user_name, status)
                 else:
-                    print "Cannot suspend user. User not in active status."
+                    Console.error("Cannot suspend user. User not in active status.")
             elif status == "blocked":
                 if current_status == "active":
                     cls.set_user_status(user_name, status)
                 else:
-                    print "Cannot block user. User not in active status."
+                    Console.error("Cannot block user. User not in active status.")
             elif status == "denied":
                 if current_status in ["approved", "pending"]:
                     cls.set_user_status(user_name, status)
                 else:
-                    print "Cannot deny user. User not in approved or pending status."
+                    Console.error("Cannot deny user. User not in approved or pending status.")
         else:
-            print "Error: Please specify the user to be amended"
+            Console.error("Please specify the user to be amended")
 
     @classmethod
     def set_user_status(cls, user_name, status):
@@ -332,9 +333,9 @@ class Users(object):
             try:
                 User.objects(username=user_name).update_one(set__status=status)
             except:
-                print "Oops! Something went wrong while trying to amend user status", sys.exc_info()[0]
+                Console.error("Oops! Something went wrong while trying to amend user status")
         else:
-            print "Error: Please specify the user to be amended"
+            Console.error("Please specify the user to be amended")
 
 
     @classmethod
@@ -346,9 +347,9 @@ class Users(object):
                     for entry in user:
                         return entry.status
             except:
-                print "Oops! Something went wrong while trying to get user status", sys.exc_info()[0]
+                Console.error("Oops! Something went wrong while trying to get user status")
         else:
-            print "Error: Please specify the user to be amended"
+            Console.error("Please specify the user to be amended")
 
     @classmethod
     def validate_email(cls, email):
@@ -411,17 +412,23 @@ class Users(object):
             if username is None:
                 user_json = User.objects.only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
-                if disp_fmt != 'json':
-                    cls.display(user_dict, username)
+                if user_dict:
+                    if disp_fmt != 'json':
+                        cls.display(user_dict, username)
+                    else:
+                        cls.display_json(user_dict, username)
                 else:
-                    cls.display_json(user_dict, username)
+                    Console.error("No users in the database.")
             else:
                 user_json = User.objects(username=username).only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
-                if disp_fmt != 'json':
-                    cls.display(user_dict, username)
+                if user_dict:
+                    if disp_fmt != 'json':
+                        cls.display(user_dict, username)
+                    else:
+                        cls.display_json(user_dict, username)
                 else:
-                    cls.display_json(user_dict, username)
+                    Console.error("No users in the database.")
         except:
             print "Oops.. Something went wrong in the list users method", sys.exc_info()[0]
         pass

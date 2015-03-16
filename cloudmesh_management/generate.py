@@ -66,7 +66,6 @@ def generate_users(n):
     users.clear()
     for i in range(0, n):
         data = random_user()
-        print data
         users.add(data)
 
 
