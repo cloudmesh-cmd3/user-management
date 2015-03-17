@@ -28,6 +28,7 @@ class cm_account_admin:
             management user delete [USERNAME]
             management user clear
             management user status USERNAME
+            management user password USERNAME PASSWORD
             management project generate
             management version
 
@@ -107,6 +108,12 @@ class cm_account_admin:
             elif arguments['user'] and arguments['status']:
                 user = Users()
                 Console.info("Status of user "+arguments['USERNAME']+" "+user.get_user_status(arguments['USERNAME']))
+            elif arguments['user'] and arguments['add']:
+                user = Users()
+                user.create_user_from_file(arguments['YAMLFILE'])
+            elif arguments['user'] and arguments['password']:
+                user = Users()
+                user.set_password(arguments['USERNAME'], arguments['PASSWORD'])
             elif arguments['project']:
                 Console.info("Dummy Projects")
             elif arguments['list']:

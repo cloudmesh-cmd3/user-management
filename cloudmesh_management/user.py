@@ -2,8 +2,10 @@ from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_management.cloudmeshobject import CloudmeshObject
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
+from cloudmesh_base.util import path_expand
 from cmd3.console import Console
 from tabulate import tabulate
+from passlib.hash import sha256_crypt
 from mongoengine import *
 import yaml
 import datetime
@@ -76,8 +78,8 @@ class User(CloudmeshObject):
 
     username = StringField(required=True)
     email = EmailField(required=True)
-    password = StringField(required=True)
-    confirm = StringField(required=True)
+    password = StringField()
+    confirm = StringField()
     title = StringField(required=True)
     firstname = StringField(required=True)
     lastname = StringField(required=True)
@@ -268,7 +270,7 @@ class Users(object):
         Adds a user
 
         :param user: the username
-        :type user: String
+        :type user: User object
         """
         user.username = cls.get_unique_username(user.username)
         user.set_date_deactivate()
@@ -467,6 +469,60 @@ class Users(object):
         else:
             if user_name:
                 print "Error: No user in the system with name '{0}'".format(user_name)
+
+    @classmethod
+    def create_user_from_file(cls, file_path):
+        try:
+            filename = path_expand(file_path)
+            file_config = ConfigDict(filename=filename)
+        except:
+            Console.error("Could not load file, please check filename and its path")
+            return
+
+        try:
+            user_config = file_config.get("cloudmesh","user")
+        except:
+            Console.error("Could not get user information from yaml file, "
+                      "please check you yaml file, users information must be "
+                      "under 'cloudmesh' -> 'users' -> user1...")
+            return
+
+        try:
+            user_name = user_config['username']
+            user_string = "User("
+            for key in user_config:
+                # print key, " - ", user_config[key]
+                user_string = user_string+key+"="+"\""+user_config[key]+"\","
+            user_string += "status=\"pending\","
+            user_string += ")"
+            data = eval(user_string)
+        except:
+            Console.error("User object creation failed.")
+            return
+
+        try:
+            if cls.check_exists(user_name) is False:
+                cls.add(data)
+                Console.info("User created in the database.")
+            else:
+                Console.error("User with user name "+user_name+" already exists.")
+                return
+        except:
+            Console.error("User creation in database failed, "+str(sys.exc_info()[0]))
+            return
+
+    @classmethod
+    def check_exists(cls, user_name):
+        return User.objects(username=user_name) > 0
+
+    @classmethod
+    def set_password(cls, user_name, passwd):
+        pass_hash = sha256_crypt.encrypt(passwd)
+        try:
+            User.objects(username=user_name).update_one(set__password=pass_hash)
+            Console.info("User password updated.")
+        except:
+            Console.error("Oops! Something went wrong while trying to set user password")
 
 
 def verified_email_domain(email):

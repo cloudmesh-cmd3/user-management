@@ -1,0 +1,20 @@
+meta:
+    yaml_version: 2.1
+    kind: management
+cloudmesh:
+    user:
+        username: aravindh
+        email: avaradha@indiana.edu
+        title: Mr.
+        firstname: Aravindh
+        lastname: Varadharaju
+        phone: 812 369 3537
+        url: www.example.com
+        citizenship: India(IN)
+        bio: This is my test Bio
+        institution: IUB
+        institutionrole: Graduate Masters
+        department: Computer Science
+        address: Indiana University, Bloomington
+        advisor: TBD
+        country: India(IN)

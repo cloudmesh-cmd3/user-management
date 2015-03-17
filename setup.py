@@ -19,7 +19,7 @@ requirements = [
     'tabulate',
     'cmd3',
     'fake-factory',
-    'cloudmesh_database'
+    'passlib'
 ]
 
 import os
