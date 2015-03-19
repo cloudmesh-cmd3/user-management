@@ -1,8 +1,12 @@
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmeshobject import CloudmeshObject
 from cloudmesh_management.user import User
+from cmd3.console import Console
 from mongoengine import *
+from tabulate import tabulate
+import json
 import uuid
+import sys
 
 
 def implement():
@@ -63,9 +67,9 @@ REQUIRED = False
 
 class Project(CloudmeshObject):
     # named connection (not 'default')
-    dbname = get_mongo_dbname_from_collection("manage")
-    if dbname:
-        meta = {'db_alias': dbname}
+    db_name = get_mongo_dbname_from_collection("manage")
+    if db_name:
+        meta = {'db_alias': db_name}
 
     '''
     The project object with its fields. The current fields include
@@ -225,25 +229,46 @@ class Project(CloudmeshObject):
 
         d = {
             "title": self.title,
+            "categories": self.categories,
+            "keywords": self.keywords,
+            "lead": self.lead,
+            "managers": self.managers,
+            "members": self.members,
+            "alumnis": self.alumnis,
+            "contact": self.contact,
+            "orientation": self.orientation,
+            "primary_discipline": self.primary_discipline,
             "abstract": self.abstract,
             "intellectual_merit": self.intellectual_merit,
             "broader_impact": self.broader_impact,
-            "use_of_fg": self.use_of_fg,
-            "scale_of_use": self.scale_of_use,
-            "categories": self.categories,
-            "keywords": self.keywords,
-            "primary_discipline": self.primary_discipline,
-            "orientation": self.orientation,
-            "contact": self.contact,
             "url": self.url,
-            "active": self.active,
-            "status": self.status,
-            "lead": self.lead,
-            "members": self.members,
+            "results": self.results,
+            "agreement_use": self.agreement_use,
+            "agreement_slides": self.agreement_slides,
+            "agreement_support": self.agreement_support,
+            "agreement_software": self.agreement_software,
+            "agreement_documentation": self.agreement_documentation,
+            "grant_organization": self.grant_organization,
+            "grant_id": self.grant_id,
+            "grant_url": self.grant_url,
             "resources_services": self.resources_services,
             "resources_software": self.resources_software,
             "resources_clusters": self.resources_clusters,
-            "resources_provision": self.resources_provision
+            "resources_provision": self.resources_provision,
+            "comment": self.comment,
+            "use_of_fg": self.use_of_fg,
+            "scale_of_use": self.scale_of_use,
+            "comments": self.comments,
+            "join_open": self.join_open,
+            "join_notification": self.join_notification,
+            "loc_name": self.loc_name,
+            "loc_street": self.loc_street,
+            "loc_additional": self.loc_additional,
+            "loc_state": self.loc_state,
+            "loc_country": self.loc_country,
+            "active": self.active,
+            "project_id": self.project_id,
+            "status": self.status
         }
         return d
 
@@ -305,8 +330,8 @@ class Projects(object):
         :type project: uuid
         """
         """adds members to a particular project"""
-        users = User.objects(user_name=user_name)
-        if users.count() == 1:
+        user = User.objects(user_name=user_name)
+        if user.count() == 1:
             if role == "member":
                 project.members.append(user)
             elif role == "lead":
@@ -386,25 +411,66 @@ class Projects(object):
         :param project: the username
         :type project: String
         """
-        print "PPPPPP", project
+
         if not project.status:
             project.status = 'pending'
-        if (project.projectid is None) or (project.projectid == ""):
+        if (project.project_id is None) or (project.project_id == ""):
             found = False
-            proposedid = None
-
-            # while not found:
-            # proposedid = uuid.uuid4()
-            # result = Project.objects(projectid=proposedid)
-            #    print "PPPPP", result
-            #    found = result.count() > 0
-            #    print result.count()
-
-            project.projectid = proposedid
-        else:
-            print "UUUUUU -{0}-".format(project.projectid)
-        print "UUID", project.projectid
+            proposed_id = None
+            project.project_id = proposed_id
         project.save()
+
+    @classmethod
+    def list_projects(cls, display_fmt=None, project_id=None):
+        try:
+            if project_id is None:
+                projects_json = Project.objects.to_json()
+                projects_dict = json.loads(projects_json)
+                if projects_dict:
+                    if display_fmt != 'json':
+                        cls.display(projects_dict, project_id)
+                    else:
+                        cls.display_json(projects_dict, project_id)
+                else:
+                    Console.error("No projects in the database.")
+        except:
+            print "Oops.. Something went wrong in the list users method", sys.exc_info()[0]
+        pass
+
+    @classmethod
+    def display(cls, project_dicts=None, project_id=None):
+        if bool(project_dicts):
+            values = []
+            for entry in project_dicts:
+                items = []
+                headers = []
+                for key, value in entry.iteritems():
+                    items.append(value)
+                    headers.append(key.replace('_', ' ').title())
+                values.append(items)
+            table_fmt = "orgtbl"
+            table = tabulate(values, headers, table_fmt)
+            separator = ''
+            try:
+                seperator = table.split("\n")[1].replace("|", "+")
+            except:
+                separator = "-" * 50
+            print separator
+            print table
+            print separator
+        else:
+            if project_id:
+                print "Error: No project in the system with name '{0}'".format(project_id)
+
+    @classmethod
+    def display_json(cls, project_dict=None, project_id=None):
+        if bool(project_dict):
+            # pprint.pprint(user_json)
+            print json.dumps(project_dict, indent=4)
+        else:
+            if project_id:
+                print "Error: No project in the system with name '{0}'".format(project_id)
+
 
     @classmethod
     def clear(cls):

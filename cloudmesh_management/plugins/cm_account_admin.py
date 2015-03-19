@@ -1,7 +1,8 @@
 from __future__ import print_function
 
-from cloudmesh_management.generate import generate_users
+from cloudmesh_management.generate import generate_users, generate_projects
 from cloudmesh_management.user import Users
+from cloudmesh_management.project import Projects
 
 from cmd3.console import Console
 from cmd3.shell import command
@@ -29,7 +30,8 @@ class cm_account_admin:
             management user clear
             management user status USERNAME
             management user password USERNAME PASSWORD
-            management project generate
+            management project generate [--count=N]
+            management project list [PROJECTID] [--format=FORMAT]
             management version
 
         Options:
@@ -114,10 +116,26 @@ class cm_account_admin:
             elif arguments['user'] and arguments['password']:
                 user = Users()
                 user.set_password(arguments['USERNAME'], arguments['PASSWORD'])
-            elif arguments['project']:
-                Console.info("Dummy Projects")
-            elif arguments['list']:
-                print("Listing Users")
+            #
+            # Project part
+            #
+            elif arguments['project'] and arguments['generate']:
+                if arguments['--count']:
+                    count = int(arguments['--count'])
+                    generate_projects(count)
+                    Console.info(str(count)+" projects generated.")
+                else:
+                    generate_users(10)
+                    Console.info("10 projects generated.")
+            elif arguments['project'] and arguments['list']:
+                project = Projects()
+                display_fmt = None
+                project_id = None
+                if arguments['--format']:
+                    display_fmt = arguments['--format']
+                if arguments['PROJECTID']:
+                    project_id = arguments['PROJECTID']
+                project.list_projects(display_fmt, project_id)
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)

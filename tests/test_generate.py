@@ -30,7 +30,7 @@ class TestGenerate:
 
         self._xyz()
         generate_users(10)
-        # generate_projects(3)
+        generate_projects(3)
         #
         # banner("Find")
         # #print users.find()
