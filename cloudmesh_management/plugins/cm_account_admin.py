@@ -125,7 +125,7 @@ class cm_account_admin:
                     generate_projects(count)
                     Console.info(str(count)+" projects generated.")
                 else:
-                    generate_users(10)
+                    generate_projects(10)
                     Console.info("10 projects generated.")
             elif arguments['project'] and arguments['list']:
                 project = Projects()

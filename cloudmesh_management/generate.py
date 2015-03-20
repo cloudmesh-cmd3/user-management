@@ -17,7 +17,6 @@ get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 users = Users()
 projects = Projects()
 
-
 # http://www.joke2k.net/faker
 
 fake = Factory.create()
@@ -75,14 +74,16 @@ def random_project():
     
     :rtype: dict
     """
+    user = User.objects.first()
+
     data = Project(
-        title=fake.sentence()[:-1],
+        title=fake.sentence()[:30],
         categories=['FutureGrid'],
         keywords=['sqllite'],
-        lead=fake.name(),
-        managers=fake.name(),
-        members=fake.name(),
-        alumnis=fake.name(),
+        lead=user,
+        managers=[fake.name()],
+        members=[user],
+        alumnis=[fake.name()],
         contact=fake.name() + "\n" + fake.address(),
         orientation="Lot's of all make",
         primary_discipline="other",
@@ -132,7 +133,6 @@ def generate_projects(n):
     projects.clear()
     for i in range(0, n):
         data = random_project()
-        print data
         projects.save(data)
 
 

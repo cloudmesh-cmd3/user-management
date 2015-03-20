@@ -5,6 +5,7 @@ from cmd3.console import Console
 from mongoengine import *
 from tabulate import tabulate
 import json
+from bson.objectid import ObjectId
 import uuid
 import sys
 
@@ -118,7 +119,7 @@ class Project(CloudmeshObject):
     # -------------------------------------------------------------------
     # Project Information
     # -------------------------------------------------------------------
-    title = StringField(required=REQUIRED)
+    title = StringField(max_length=30, required=REQUIRED)
 
     # -------------------------------------------------------------------
     # Project Vocabulary
@@ -339,7 +340,7 @@ class Projects(object):
             elif role == "lead":
                 project.alumni.append(user)
         else:
-            print "ERROR: The user `{0}` has not registered with FutureGrid".format(user_name)
+            Console.error("The user `{0}` has not registered with FutureGrid".format(user_name))
 
     @classmethod
     def find_users(cls, project, role):
@@ -422,9 +423,10 @@ class Projects(object):
 
     @classmethod
     def list_projects(cls, display_fmt=None, project_id=None):
+        req_fields = ["title", "status", "lead", "managers", "members", "project_id"]
         try:
             if project_id is None:
-                projects_json = Project.objects.to_json()
+                projects_json = Project.objects.only(*req_fields).to_json()
                 projects_dict = json.loads(projects_json)
                 if projects_dict:
                     if display_fmt != 'json':
@@ -434,7 +436,7 @@ class Projects(object):
                 else:
                     Console.error("No projects in the database.")
         except:
-            print "Oops.. Something went wrong in the list users method", sys.exc_info()[0]
+            Console.error("Oops.. Something went wrong in the list projects method "+sys.exc_info()[0])
         pass
 
     @classmethod
@@ -445,7 +447,26 @@ class Projects(object):
                 items = []
                 headers = []
                 for key, value in entry.iteritems():
-                    items.append(value)
+                    if key == "lead":
+                        user = User.objects.get(id=ObjectId(value.get('$oid')))
+                        lead_name = user.firstname+" "+user.lastname
+                        items.append(lead_name)
+                    elif key == "members":
+                        for item in value:
+                            user = User.objects.get(id=ObjectId(item.get('$oid')))
+                            entry = user.firstname+" "+user.lastname+","
+                        entry = entry.strip(',')
+                        items.append(entry)
+                    elif key == "managers":
+                        entry=""
+                        for item in value:
+                            entry += item.encode('ascii','ignore')
+                        entry = entry.strip(', ')
+                        items.append(entry)
+                    elif key == "project_id":
+                        items.append(value.get('$uuid').encode('ascii','ignore'))
+                    else:
+                        items.append(value)
                     headers.append(key.replace('_', ' ').title())
                 values.append(items)
             table_fmt = "orgtbl"
@@ -460,7 +481,7 @@ class Projects(object):
             print separator
         else:
             if project_id:
-                print "Error: No project in the system with name '{0}'".format(project_id)
+                Console.error("No project in the system with name '{0}'".format(project_id))
 
     @classmethod
     def display_json(cls, project_dict=None, project_id=None):
@@ -469,7 +490,7 @@ class Projects(object):
             print json.dumps(project_dict, indent=4)
         else:
             if project_id:
-                print "Error: No project in the system with name '{0}'".format(project_id)
+                Console.error("No project in the system with name '{0}'".format(project_id))
 
 
     @classmethod

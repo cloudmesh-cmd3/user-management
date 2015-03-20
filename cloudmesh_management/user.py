@@ -432,7 +432,7 @@ class Users(object):
                 else:
                     Console.error("No users in the database.")
         except:
-            print "Oops.. Something went wrong in the list users method", sys.exc_info()[0]
+            Console.error("Oops.. Something went wrong in the list users method "+sys.exc_info()[0])
         pass
 
     @classmethod
@@ -458,7 +458,7 @@ class Users(object):
             print separator
         else:
             if user_name:
-                print "Error: No user in the system with name '{0}'".format(user_name)
+                Console.error("No user in the system with name '{0}'".format(user_name))
 
 
     @classmethod
@@ -468,7 +468,7 @@ class Users(object):
             print json.dumps(user_dict, indent=4)
         else:
             if user_name:
-                print "Error: No user in the system with name '{0}'".format(user_name)
+                Console.error("No user in the system with name '{0}'".format(user_name))
 
     @classmethod
     def create_user_from_file(cls, file_path):
