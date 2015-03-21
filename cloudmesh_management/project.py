@@ -1,6 +1,6 @@
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmeshobject import CloudmeshObject
-from cloudmesh_management.user import User
+from cloudmesh_management.user import User, Users
 from cmd3.console import Console
 from mongoengine import *
 from tabulate import tabulate
@@ -319,7 +319,7 @@ class Projects(object):
         project.save()
 
     @classmethod
-    def add_user(cls, user_name, project, role):
+    def add_user(cls, user_name, project_id, role):
         """
         Adds a member to the project.
 
@@ -331,16 +331,21 @@ class Projects(object):
         :type project: uuid
         """
         """adds members to a particular project"""
-        user = User.objects(user_name=user_name)
-        if user.count() == 1:
+        user = User.objects(username=user_name).first()
+        if user and role != 'alumni':
             if role == "member":
-                project.members.append(user)
+                Project.objects(project_id=project_id).update_one(push__members=user)
+                Console.info("User `{0}` added as Project member.".format(user_name))
             elif role == "lead":
-                project.lead.append(user)
-            elif role == "lead":
-                project.alumni.append(user)
+                Project.objects(project_id=project_id).update_one(set__lead=user)
+                Console.info("User `{0}` set as Lead.".format(user_name))
+            else:
+                Console.error("Role `{0}` cannot be amended".format(role))
+        elif role == 'alumni':
+            Project.objects(project_id=project_id).update_one(push__alumnis=user_name)
+            Console.info("User `{0}` added as Alumni.".format(user_name))
         else:
-            Console.error("The user `{0}` has not registered with FutureGrid".format(user_name))
+            Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
 
     @classmethod
     def find_users(cls, project, role):
@@ -452,9 +457,10 @@ class Projects(object):
                         lead_name = user.firstname+" "+user.lastname
                         items.append(lead_name)
                     elif key == "members":
+                        entry=""
                         for item in value:
                             user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry = user.firstname+" "+user.lastname+","
+                            entry += user.firstname+" "+user.lastname+","
                         entry = entry.strip(',')
                         items.append(entry)
                     elif key == "managers":
@@ -498,3 +504,18 @@ class Projects(object):
         """removes all projects from the database"""
         for project in Project.objects:
             project.delete()
+
+    @classmethod
+    def delete_project(cls, projectid=None):
+        if projectid:
+            try:
+                project = Project.objects(project_id=projectid)
+                if project:
+                    project.delete()
+                    Console.info("Project with id `{0}` removed from the database.".format(projectid))
+                else:
+                    Console.error("Project with id `{0}` does not exist.".format(projectid))
+            except:
+                Console.error("Oops! Something went wrong while trying to remove a project")
+        else:
+            Console.error("Please specify the project to be removed")

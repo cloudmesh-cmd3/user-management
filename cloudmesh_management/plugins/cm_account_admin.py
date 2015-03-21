@@ -32,6 +32,10 @@ class cm_account_admin:
             management user password USERNAME PASSWORD
             management project generate [--count=N]
             management project list [PROJECTID] [--format=FORMAT]
+            management project clear
+            management project delete [PROJECTID]
+            management project status [PROJECTID]
+            management project add member [USERNAME] [PROJECTID] [ROLE]
             management version
 
         Options:
@@ -136,6 +140,19 @@ class cm_account_admin:
                 if arguments['PROJECTID']:
                     project_id = arguments['PROJECTID']
                 project.list_projects(display_fmt, project_id)
+            elif arguments['project'] and arguments['clear']:
+                project = Projects()
+                project.clear()
+                Console.info("Projects cleared from the database.")
+            elif arguments['project'] and arguments['delete']:
+                if arguments['PROJECTID']:
+                    project = Projects()
+                    project.delete_project(arguments['PROJECTID'])
+                else:
+                    Console.error("Please specify a project id to be removed")
+            elif arguments['project'] and arguments['add'] and arguments['member']:
+                project = Projects()
+                project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)
