@@ -1,5 +1,6 @@
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_management.cloudmeshobject import CloudmeshObject
+from cloudmesh_management.project import Project
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
 from cloudmesh_base.util import path_expand
@@ -100,7 +101,7 @@ class User(CloudmeshObject):
 
     status = StringField(required=True, default='pending')
     userid = UUIDField()
-    projects = StringField()
+    projects = ListField(ReferenceField(Project))
 
     """
     Message received from either reviewers,
@@ -433,6 +434,23 @@ class Users(object):
                     Console.error("No users in the database.")
         except:
             Console.error("Oops.. Something went wrong in the list users method "+sys.exc_info()[0])
+        pass
+
+
+    @classmethod
+    def list_projects(cls, user_name=None):
+        required_fields=["username", "firstname", "lastname", "projects"]
+        try:
+            if user_name:
+                user_json = User.objects.only(*required_fields).to_json()
+                user_dict = json.loads(user_json)
+                if user_dict:
+                    cls.display(user_dict, user_name)
+                else:
+                    Console.error("No user details available in the database.")
+        except:
+            Console.error("Please provide a username.")
+
         pass
 
     @classmethod

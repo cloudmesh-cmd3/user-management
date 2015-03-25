@@ -37,6 +37,7 @@ class cm_account_admin:
             management user delete [USERNAME]
             management user clear
             management user status USERNAME
+            management user projects USERNAME
             management user password USERNAME PASSWORD
             management project generate [--count=N]
             management project list [PROJECTID] [--format=FORMAT]
@@ -132,6 +133,9 @@ class cm_account_admin:
             elif arguments['user'] and arguments['password']:
                 user = Users()
                 user.set_password(arguments['USERNAME'], arguments['PASSWORD'])
+            elif arguments['user'] and arguments['projects']:
+                user = Users()
+                user.list_projects(arguments['USERNAME'])
             #
             # Project part
             #

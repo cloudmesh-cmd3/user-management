@@ -332,20 +332,25 @@ class Projects(object):
         """
         """adds members to a particular project"""
         user = User.objects(username=user_name).first()
-        if user and role != 'alumni':
-            if role == "member":
-                Project.objects(project_id=project_id).update_one(push__members=user)
-                Console.info("User `{0}` added as Project member.".format(user_name))
-            elif role == "lead":
-                Project.objects(project_id=project_id).update_one(set__lead=user)
-                Console.info("User `{0}` set as Lead.".format(user_name))
+        project = Project.objects(project_id=project_id).first()
+        if project:
+            if user and role != 'alumni':
+                if role == "member":
+                    Project.objects(project_id=project_id).update_one(push__members=user)
+                    User.objects(username=user_name).update_one(push_projects=project)
+                    Console.info("User `{0}` added as Project member.".format(user_name))
+                elif role == "lead":
+                    Project.objects(project_id=project_id).update_one(set__lead=user)
+                    Console.info("User `{0}` set as Lead.".format(user_name))
+                else:
+                    Console.error("Role `{0}` cannot be amended".format(role))
+            elif role == 'alumni':
+                Project.objects(project_id=project_id).update_one(push__alumnis=user_name)
+                Console.info("User `{0}` added as Alumni.".format(user_name))
             else:
-                Console.error("Role `{0}` cannot be amended".format(role))
-        elif role == 'alumni':
-            Project.objects(project_id=project_id).update_one(push__alumnis=user_name)
-            Console.info("User `{0}` added as Alumni.".format(user_name))
+                Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
         else:
-            Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
+            Console.error("The project `{0}` is not registered with Future Systems".format(project_id))
 
     @classmethod
     def remove_user(cls, user_name, project_id):
