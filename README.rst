@@ -113,13 +113,12 @@ To amend a status of the user::
 * User will be in pending state by default
 * The commands to change the user status are self explanatory
 
-    .. note::
+.. note::
 
     The state changes for a user is listed in the figure below::
 
     ..  figure:: docs/management_states.png
         :scale: 50%
-        :align: center
         :alt: User states
 
 Manage Projects
@@ -141,7 +140,8 @@ To add a member to a project::
 
     cm management project add member <USERID> <PROJECTID> <ROLE>
 
-    .. note::
+
+.. note::
 
     THe user roles are member, lead, alumni. When adding a user as a member or lead, the USERID should be available
     within the database. If not an error message would be displayed. An alumni need not be a valid user within the
