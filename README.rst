@@ -115,11 +115,11 @@ To amend a status of the user::
 
 .. note::
 
-    The state changes for a user is listed in the figure below::
+The state changes for a user is listed in the figure below:
 
-    ..  figure:: docs/management_states.png
-        :scale: 50%
-        :alt: User states
+..  figure:: docs/management_states.png
+    :scale: 50%
+    :alt: User states
 
 Manage Projects
 ===============
