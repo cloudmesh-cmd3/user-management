@@ -106,7 +106,9 @@ To add a user using a YAML file::
 
     cm management user add <PATH TO YAML FILE>
 
-    .. note:: A sample YAML file is available in etc directory within managament
+.. note::
+
+    A sample YAML file is available in etc directory within managament
 
 To amend a status of the user::
 
