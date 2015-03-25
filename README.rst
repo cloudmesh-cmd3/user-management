@@ -1,107 +1,103 @@
-CMD3 Commandline definition example
-===================================
+Command line User and Project Management
+========================================
 
-In this example we will teach you how simple it is to create separate python modules and add them to cmd3 via the
-plugin mechanism. We will use the simple system command ping in this example to ping a machine and to notify the user
- if it is available or not.
+This module deals with management of users and projects using CMD3.
 
 The code is located at:
 
-* https://github.com/cloudmesh/cmd3_example.git
+* https://github.com/cloudmesh/management.git
 
-  First, please check it out with::
+Assumptions:
 
-    git clone https://github.com/cloudmesh/cmd3_example.git
+* Python 2.7.9 is installed
+* virtual environment is installed and setup (for example, virtualenv ~/ENV -p <path to python version 2.7.9>)
+* Cloudmesh is installed
+* mongo server is running (fab server.start)
 
- Next enter the directory with::
+Clone the project with::
 
-   cd cmd3_example
+    git clone https://github.com/cloudmesh/management.git
 
-You may want to explore two files. One is the code that contains a simple wrapper class to ping. Naturally we could
-have omitted that cass, but it shows you how to organize your code as we want to keep the code in the command shell
-very limited. This will also simplify testing of the cmd3 extensions more easily.
+Change to the cloned directory::
 
-The code in HostStatus.py contains the the class method HOSTSTATUS.status(hostname) tht we use in the creation of a
-shell command next. The shell command is located in the plugin directory in the file:
+    cd management
 
-* cmd3_example/plugins/cm_shell_hoststatus.py
+Setup the requirements with::
 
-  Edit this file and review with the cmd3 documentation at hand what is happening.
+    python setup.py requirements
 
-  first we define a class that is later on is used by cmd3. The class contains to methods. An activation method and a do
-  method. The activation method must be followed by the classname. The do method is the actual command that we define.
+Install the module::
 
-  In the activation method you should not define any big program but only setting variables. Do not use the activation
-  method to start databases or other code. This is all to be set in the do method. However you can avoid the repeated
-  execution of code in the do method through a boolean variable. In our case we do not such complicated things, but
-  just add a "command type" my commands. This is useful in case you have many commands and you like to distinguish them
-  in the::
+    python setup.py install
 
-    cm help
+If you are starting from scratch, the commands that needs to be run are listed below::
 
-command.
+    pip install cloudmesh_base
+    pip install cmd3
+    pip install cloudmesh_database
+    python setup.py requirements
+    python setup.py install
 
-To install this command you must have cmd3 installed. you can do this simply with::
+If everything is setup correctly, run the following command::
 
-  pip install cmd3
-  
-next you execute (while standing in the cmd3_example directory)::
+    cm management -h
 
-  python setup.py requirements
-  python setup.py install
+You should see the screen below::
 
-Now you have installed the example into your environment. However you need to still register this new package with
-cmd3. This is easy as you can place the following filr into the directory
+    management - Command line option to manage users and projects
 
-  ~/.cloudmesh/cmd3.yaml
+        Usage:
+            management user generate [--count=N]
+            management user list [USERNAME] [--format=FORMAT]
+            management user add [YAMLFILE]
+            management user approve [USERNAME]
+            management user activate [USERNAME]
+            management user suspend [USERNAME]
+            management user block [USERNAME]
+            management user deny [USERNAME]
+            management user delete [USERNAME]
+            management user clear
+            management user status USERNAME
+            management user password USERNAME PASSWORD
+            management project generate [--count=N]
+            management project list [PROJECTID] [--format=FORMAT]
+            management project clear
+            management project delete [PROJECTID]
+            management project status [PROJECTID]
+            management project activate [PROJECTID]
+            management project deactivate [PROJECTID]
+            management project close [PROJECTID]
+            management project add member [USERNAME] [PROJECTID] [ROLE]
+            management version
 
-::
-    meta:
-	yaml_version: 2.1
-	kind: cmd3
-	filename: ${HOME}/.cloudmesh/cmd3.yaml
-	location: ${HOME}/.cloudmesh/cmd3.yaml
-	prefix: cmd3
-    cmd3:
-	modules:
-	- cloudmesh_cmd3.plugins
-	- cloudmesh_docker.plugins
-	- cloudmesh_slurm.plugins
-	- cloudmesh_deploy.plugins
-	- cmd3_example.plugins
+        Options:
+            -h --help       Show this screen
 
-Make sure the file does not have any tabs in it.
+Manage Users
+============
 
-Now you can start cmd3 with::
+To generate a list of users run::
 
-  cm
+    cm management user generate
 
-and issue the command
+To get a list of users run::
 
-  help
+    cm management user list
 
-You should be able to see the new command. Or you can just say 
+To get detail about a particular user::
 
-To start it you simply say::
+    cm management user list USERNAME
 
- cm>  hoststatus iu.edu
- 
-to run it directly from commandline you can use::
+To add a user using a YAML file::
 
-  cm hoststatus iu.edu
+    cm management user add <PATH TO YAML FILE>
 
-If you have written extensions with cmd3 let us know we could discuss the creation ofa user contributed space in the
-cmd3 git reporsitory.
+    Note: A sample YAML file is available in etc directory within managament
 
+To amend a status of the user::
 
-  
+* The state changes for a user is listed in the figure below:
 
-
-
-
-
-
-
-
-  
- 
+    ..  figure:: docs/management_states.png
+        :scale: 50%
+        :alt: User states

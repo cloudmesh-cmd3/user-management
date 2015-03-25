@@ -51,8 +51,6 @@ class cm_account_admin:
 
         Options:
             -h --help       Show this screen
-            --format=FORMAT Output format: table, json
-            --all           Displays all users
         """
 
         # arguments = docopt(management_command.__doc__, args[1:])
