@@ -348,6 +348,16 @@ class Projects(object):
             Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
 
     @classmethod
+    def remove_user(cls, user_name, project_id):
+        user = User.objects(username=user_name).first()
+        if user:
+            Project.objects(project_id=project_id).update_one(pull__members=user)
+            Console.info("User `{0}` removed as Project member.".format(user_name))
+        else:
+            Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
+
+
+    @classmethod
     def find_users(cls, project, role):
         '''returns all the members of a particular project
 

@@ -47,10 +47,12 @@ class cm_account_admin:
             management project deactivate [PROJECTID]
             management project close [PROJECTID]
             management project add member [USERNAME] [PROJECTID] [ROLE]
+            management project remove member [USERNAME] [PROJECTID]
             management version
 
         Options:
             -h --help       Show this screen
+            --format=json   Show the user details in json format
         """
 
         # arguments = docopt(management_command.__doc__, args[1:])
@@ -163,6 +165,9 @@ class cm_account_admin:
             elif arguments['project'] and arguments['add'] and arguments['member']:
                 project = Projects()
                 project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
+            elif arguments['project'] and arguments['remove'] and arguments['member']:
+                project = Projects()
+                project.remove_user(arguments['USERNAME'], arguments['PROJECTID'])
             elif arguments['project'] and arguments['status']:
                 project = Projects()
                 Console.info("Status of project is: "+project.get_project_status(arguments['PROJECTID']))
