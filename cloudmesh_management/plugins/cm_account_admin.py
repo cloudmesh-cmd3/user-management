@@ -8,7 +8,15 @@ from cmd3.console import Console
 from cmd3.shell import command
 
 
+def get_version():
+    import cloudmesh_management
+    return cloudmesh_management.version
+
+
 class cm_account_admin:
+
+    def __init__(self):
+        pass
 
     def activate_cm_account_admin (self):
         self.register_command_topic('admin', 'management')
@@ -35,12 +43,14 @@ class cm_account_admin:
             management project clear
             management project delete [PROJECTID]
             management project status [PROJECTID]
+            management project activate [PROJECTID]
+            management project deactivate [PROJECTID]
+            management project close [PROJECTID]
             management project add member [USERNAME] [PROJECTID] [ROLE]
             management version
 
         Options:
             -h --help       Show this screen
-            --version       Show version
             --format=FORMAT Output format: table, json
             --all           Displays all users
         """
@@ -48,7 +58,9 @@ class cm_account_admin:
         # arguments = docopt(management_command.__doc__, args[1:])
 
         try:
-            if arguments['user'] and arguments['list']:
+            if arguments['version']:
+                Console.info("Version: " + get_version())
+            elif arguments['user'] and arguments['list']:
                 user = Users()
                 display_fmt = None
                 user_name = None
@@ -153,6 +165,30 @@ class cm_account_admin:
             elif arguments['project'] and arguments['add'] and arguments['member']:
                 project = Projects()
                 project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
+            elif arguments['project'] and arguments['status']:
+                project = Projects()
+                Console.info("Status of project is: "+project.get_project_status(arguments['PROJECTID']))
+            elif arguments['project'] and arguments['activate']:
+                if arguments['PROJECTID']:
+                    project = Projects()
+                    project.set_project_status(arguments['PROJECTID'], 'active')
+                    Console.info("Project "+arguments['PROJECTID']+" activated.")
+                else:
+                    Console.error("Please specify a project to be amended")
+            elif arguments['project'] and arguments['deactivate']:
+                if arguments['PROJECTID']:
+                    project = Projects()
+                    project.set_project_status(arguments['PROJECTID'], 'blocked')
+                    Console.info("Project "+arguments['PROJECTID']+" de-activated.")
+                else:
+                    Console.error("Please specify a project to be amended")
+            elif arguments['project'] and arguments['close']:
+                if arguments['PROJECTID']:
+                    project = Projects()
+                    project.set_project_status(arguments['PROJECTID'], 'closed')
+                    Console.info("Project "+arguments['PROJECTID']+" closed.")
+                else:
+                    Console.error("Please specify a project to be amended")
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)

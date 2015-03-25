@@ -261,7 +261,7 @@ class Users(object):
         while username.count() > 0:
             new_proposal = proposal + str(num)
             username = User.objects(username=new_proposal)
-            num = num + 1
+            num += 1
         return new_proposal
 
     @classmethod
@@ -294,36 +294,37 @@ class Users(object):
             Console.error("Please specify the user to be removed")
 
     @classmethod
-    def amend_user_status(cls, user_name=None, status=None):
+    def amend_user_status(cls, user_name=None, new_status=None):
+        current_status = ""
         if user_name:
             try:
                 current_status = cls.get_user_status(user_name)
             except:
                 Console.error("Oops! Something went wrong while trying to get user status")
 
-            if status == "approved":
+            if new_status == "approved":
                 if current_status in ["pending", "denied"]:
-                    cls.set_user_status(user_name, status)
+                    cls.set_user_status(user_name, new_status)
                 else:
                     Console.error("Cannot approve user. User not in pending status.")
-            elif status == "active":
+            elif new_status == "active":
                 if current_status in ["approved", "suspended", "blocked"]:
-                    cls.set_user_status(user_name, status)
+                    cls.set_user_status(user_name, new_status)
                 else:
                     Console.error("Cannot activate user. User not in approved or suspended status.")
-            elif status == "suspended":
+            elif new_status == "suspended":
                 if current_status == "active":
-                    cls.set_user_status(user_name, status)
+                    cls.set_user_status(user_name, new_status)
                 else:
                     Console.error("Cannot suspend user. User not in active status.")
-            elif status == "blocked":
+            elif new_status == "blocked":
                 if current_status == "active":
-                    cls.set_user_status(user_name, status)
+                    cls.set_user_status(user_name, new_status)
                 else:
                     Console.error("Cannot block user. User not in active status.")
-            elif status == "denied":
+            elif new_status == "denied":
                 if current_status in ["approved", "pending"]:
-                    cls.set_user_status(user_name, status)
+                    cls.set_user_status(user_name, new_status)
                 else:
                     Console.error("Cannot deny user. User not in approved or pending status.")
         else:
@@ -351,16 +352,15 @@ class Users(object):
             except:
                 Console.error("Oops! Something went wrong while trying to get user status")
         else:
-            Console.error("Please specify the user to be amended")
+            Console.error("Please specify the user get status")
 
     @classmethod
     def validate_email(cls, email):
+
         """
         Verifies if the email of the user is not already in the users.
-
-        :param user: user object
-        :type user: User
-        :rtype: Boolean
+        :param email: email id of the user
+        :return: true or false
         """
         user = User.objects(email=email)
         valid = user.count() == 0

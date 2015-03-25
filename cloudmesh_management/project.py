@@ -506,16 +506,67 @@ class Projects(object):
             project.delete()
 
     @classmethod
-    def delete_project(cls, projectid=None):
-        if projectid:
+    def delete_project(cls, project_id=None):
+        if project_id:
             try:
-                project = Project.objects(project_id=projectid)
+                project = Project.objects(project_id=project_id)
                 if project:
                     project.delete()
-                    Console.info("Project with id `{0}` removed from the database.".format(projectid))
+                    Console.info("Project with id `{0}` removed from the database.".format(project_id))
                 else:
-                    Console.error("Project with id `{0}` does not exist.".format(projectid))
+                    Console.error("Project with id `{0}` does not exist.".format(project_id))
             except:
                 Console.error("Oops! Something went wrong while trying to remove a project")
         else:
             Console.error("Please specify the project to be removed")
+
+    @classmethod
+    def amend_project_status(cls, project_id=None, new_status=None):
+        current_status = ""
+        if project_id:
+            try:
+                current_status = cls.get_project_status(project_id)
+            except:
+                Console.error("Oops! Something went wrong while trying to get project status")
+
+            if new_status == "active":
+                if current_status in ["pending", "blocked"]:
+                    cls.set_project_status(project_id, new_status)
+                else:
+                    Console.error("Cannot activate project. Project is not in pending/blocked status.")
+            elif new_status == "block":
+                if current_status in ["active", "pending"]:
+                    cls.set_project_status(project_id, new_status)
+                else:
+                    Console.error("Cannot block project. Project is not active or pending.")
+            elif new_status == "close":
+                if current_status in ["active", "pending", "blocked"]:
+                    cls.set_project_status(project_id, new_status)
+                else:
+                    Console.error("Cannot close project. Project is not active/pending/blocked.")
+        else:
+            Console.error("Please specify the project to be amended")
+
+    @classmethod
+    def get_project_status(cls, project_id):
+        if project_id:
+            try:
+                project = Project.objects(project_id=project_id).only('status')
+                if project:
+                    for entry in project:
+                        return entry.status
+            except:
+                Console.error("Oops! Something went wrong while trying to get user status")
+        else:
+            Console.error("Please specify the user get status")
+
+
+    @classmethod
+    def set_project_status(cls, project_id, status):
+        if project_id:
+            try:
+                Project.objects(project_id=project_id).update_one(set__status=status)
+            except:
+                Console.error("Oops! Something went wrong while trying to amend project status")
+        else:
+            Console.error("Please specify the project to be amended")
