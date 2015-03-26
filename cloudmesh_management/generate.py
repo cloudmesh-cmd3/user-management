@@ -1,9 +1,7 @@
-# generates test users and projects
-
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
-from cloudmesh_management.project import Project, Projects
-
-from cloudmesh_management.user import User, Users
+from cloudmesh_management.project import Projects
+from cloudmesh_management.user import Users
+from cloudmesh_management.base_classes import User, Project
 from faker import Factory
 from pprint import pprint
 import uuid

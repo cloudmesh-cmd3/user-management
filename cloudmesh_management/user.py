@@ -1,15 +1,12 @@
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_management.cloudmeshobject import CloudmeshObject
-from cloudmesh_management.project import Project
+from cloudmesh_management.base_classes import User
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
 from tabulate import tabulate
 from passlib.hash import sha256_crypt
-from mongoengine import *
 import yaml
-import datetime
 import json
 import sys
 
@@ -59,165 +56,6 @@ def read_user(filename):
         message=data["message"],
     )
     return user
-
-
-class User(CloudmeshObject):
-    """
-    This class is used to represent a Cloudmesh User
-    """
-
-    db_name = get_mongo_dbname_from_collection("manage")
-    if db_name:
-        meta = {'db_alias': db_name}
-    #
-    # defer the connection to where the object is instantiated
-    # get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
-
-    """
-    User fields
-    """
-
-    username = StringField(required=True)
-    email = EmailField(required=True)
-    password = StringField()
-    confirm = StringField()
-    title = StringField(required=True)
-    firstname = StringField(required=True)
-    lastname = StringField(required=True)
-    phone = StringField(required=True)
-    url = StringField(required=True)
-    citizenship = StringField(required=True)
-    bio = StringField(required=True)
-    institution = StringField(required=True)
-    institutionrole = StringField(required=True)
-    department = StringField(required=True)
-    address = StringField(required=True)
-    advisor = StringField(required=True)
-    country = StringField(required=True)
-
-    """
-    Hidden fields
-    """
-
-    status = StringField(required=True, default='pending')
-    userid = UUIDField()
-    projects = ListField(ReferenceField(Project))
-
-    """
-    Message received from either reviewers,
-    committee or other users. It is a list because
-    there might be more than one message
-    """
-
-    message = ListField(StringField())
-
-    @classmethod
-    def order(cls):
-        """
-        Order the attributes to be printed in the display
-        method
-        """
-        try:
-            return [
-                ("username", cls.username),
-                ("status", cls.status),
-                ("title", cls.title),
-                ("firstname", cls.firstname),
-                ("lastname", cls.lastname),
-                ("email", cls.email),
-                ("url", cls.url),
-                ("citizenship", cls.citizenship),
-                ("bio", cls.bio),
-                ("password", cls.password),
-                ("phone", cls.phone),
-                ("projects", cls.projects),
-                ("institution", cls.institution),
-                ("department", cls.department),
-                ("address", cls.address),
-                ("country", cls.country),
-                ("advisor", cls.advisor),
-                ("date_modified", cls.date_modified),
-                ("date_created", cls.date_created),
-                ("date_approved", cls.date_approved),
-                ("date_deactivated", cls.date_deactivated),
-            ]
-        except:
-            return None
-
-    @classmethod
-    def hidden(cls):
-        """
-        Hidden attributes
-        """
-        return [
-            "userid",
-            "active",
-            "message",
-        ]
-
-
-    def is_active(self):
-        """
-        Check if the user is active
-        """
-        d1 = datetime.datetime.now()
-        return (self.active == True) and (datetime.datetime.now() < self.date_deactivate)
-
-    @classmethod
-    def set_password(cls, password):
-        """
-        Not implemented
-
-        :param password:
-        :type password:
-        """
-        #self.password_hash = generate_password_hash(password)
-        pass
-
-    @classmethod
-    def check_password(cls, password):
-        """
-        Not implemented
-
-        :param password:
-        :type password:
-        """
-        # return check_password_hash(self.password_hash, password)
-        pass
-
-    @classmethod
-    def json(cls):
-        """
-        Returns a json representation of the object
-        """
-        d = {}
-        for (field, value) in cls.order():
-            try:
-                d[field] = value
-            except:
-                pass
-        return d
-
-    @classmethod
-    def yaml(cls):
-        """
-        Returns the yaml object of the object.
-        """
-        return cls.__str__(fields=True, all=True)
-
-    """
-    def __str__(self, fields=False, all=False):
-        content = ""
-        for (field, value)  in self.order():
-            try:
-                if not (value is None or value == "") or all:
-                    if fields:
-                        content = content + field + ": "
-                    content = content + value + "\n"
-            except:
-                pass
-        return content
-    """
 
 
 class Users(object):

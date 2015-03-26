@@ -18,7 +18,7 @@ class cm_account_admin:
     def __init__(self):
         pass
 
-    def activate_cm_account_admin (self):
+    def activate_cm_account_admin(self):
         self.register_command_topic('admin', 'management')
 
     @command
@@ -92,35 +92,35 @@ class cm_account_admin:
             elif arguments['user'] and arguments['approve']:
                 if arguments['USERNAME']:
                     user = Users()
-                    user.amend_user_status(arguments['USERNAME'], status='approved')
+                    user.amend_user_status(arguments['USERNAME'], new_status='approved')
                     Console.info("User "+arguments['USERNAME']+" approved.")
                 else:
                     Console.error("Please specify a user to be amended")
             elif arguments['user'] and arguments['activate']:
                 if arguments['USERNAME']:
                     user = Users()
-                    user.amend_user_status(arguments['USERNAME'], status='active')
+                    user.amend_user_status(arguments['USERNAME'], new_status='active')
                     Console.info("User "+arguments['USERNAME']+" activated.")
                 else:
                     Console.error("Please specify a user to be amended")
             elif arguments['user'] and arguments['suspend']:
                 if arguments['USERNAME']:
                     user = Users()
-                    user.amend_user_status(arguments['USERNAME'], status='suspended')
+                    user.amend_user_status(arguments['USERNAME'], new_status='suspended')
                     Console.info("User "+arguments['USERNAME']+" suspended.")
                 else:
                     Console.error("Please specify a user to be amended")
             elif arguments['user'] and arguments['block']:
                 if arguments['USERNAME']:
                     user = Users()
-                    user.amend_user_status(arguments['USERNAME'], status='blocked')
+                    user.amend_user_status(arguments['USERNAME'], new_status='blocked')
                     Console.info("User "+arguments['USERNAME']+" blocked.")
                 else:
                     Console.error("Please specify a user to be amended")
             elif arguments['user'] and arguments['deny']:
                 if arguments['USERNAME']:
                     user = Users()
-                    user.amend_user_status(arguments['USERNAME'], status='denied')
+                    user.amend_user_status(arguments['USERNAME'], new_status='denied')
                     Console.info("User "+arguments['USERNAME']+" denied.")
                 else:
                     Console.error("Please specify a user to be amended")
