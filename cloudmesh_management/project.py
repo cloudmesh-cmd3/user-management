@@ -1,6 +1,6 @@
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmeshobject import CloudmeshObject
-from cloudmesh_management.user import User, Users
+from cloudmesh_management.user import User
 from cmd3.console import Console
 from mongoengine import *
 from tabulate import tabulate
@@ -213,15 +213,7 @@ class Project(CloudmeshObject):
     project_id = UUIDField()
 
     status = StringField(choices=STATUS, required=REQUIRED)
-    # maybe we do not need active as this may be covered in status
 
-    # -------------------------------------------------------------------
-    # Project Committee: contains all the information about the projects committee
-    # -------------------------------------------------------------------
-    # comittee = ReferenceField(Committee)
-
-    # BUG how can we add also arbitrary info in case of other, maybe omit
-    # choices
 
     def to_json(self):
         """

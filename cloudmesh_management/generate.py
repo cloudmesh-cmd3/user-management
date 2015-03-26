@@ -28,6 +28,7 @@ def random_user():
 
     :rtype: dict
     """
+    project = Project.objects.first()
     firstname = fake.first_name()
     prefix = fake.prefix()
     data = User(
@@ -50,6 +51,7 @@ def random_user():
         url=fake.url(),
         advisor=fake.name(),
         confirm=fake.word(),
+        projects=[project],
     )
     return data
 

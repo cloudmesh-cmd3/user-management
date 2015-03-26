@@ -13,7 +13,7 @@ import datetime
 import json
 import sys
 
-STATUS = ('pending', 'approved', 'blocked', 'denied','active','suspended')
+STATUS = ('pending', 'approved', 'blocked', 'denied', 'active', 'suspended')
 
 
 def implement():
@@ -141,7 +141,7 @@ class User(CloudmeshObject):
                 ("date_approved", cls.date_approved),
                 ("date_deactivated", cls.date_deactivated),
             ]
-        except Exception, e:
+        except:
             return None
 
     @classmethod
@@ -155,9 +155,6 @@ class User(CloudmeshObject):
             "message",
         ]
 
-
-    # def save(self,db):
-    # db.put({"firname":user.firname,...})
 
     def is_active(self):
         """
@@ -434,8 +431,6 @@ class Users(object):
                     Console.error("No users in the database.")
         except:
             Console.error("Oops.. Something went wrong in the list users method "+sys.exc_info()[0])
-        pass
-
 
     @classmethod
     def list_projects(cls, user_name=None):
@@ -450,8 +445,6 @@ class Users(object):
                     Console.error("No user details available in the database.")
         except:
             Console.error("Please provide a username.")
-
-        pass
 
     @classmethod
     def display(cls, user_dicts=None, user_name=None):
@@ -553,6 +546,6 @@ def verified_email_domain(email):
     domains = ["indiana.edu"]
 
     for domain in domains:
-        if email.endswith():
+        if email.endswith() == domain:
             return True
     return False

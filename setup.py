@@ -109,7 +109,7 @@ class InstallAll(install):
 setup(
     name='cloudmesh_management',
     version=version,
-    description='Usere management for cloudmesh',
+    description='User management for cloudmesh',
     # description-file =
     #    README.rst
     author='The Cloudmesh Team',
