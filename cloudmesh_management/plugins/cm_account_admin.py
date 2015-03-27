@@ -1,9 +1,7 @@
 from __future__ import print_function
-
 from cloudmesh_management.generate import generate_users, generate_projects
 from cloudmesh_management.user import Users
 from cloudmesh_management.project import Projects
-
 from cmd3.console import Console
 from cmd3.shell import command
 
@@ -26,30 +24,31 @@ class cm_account_admin:
         """management - Command line option to manage users and projects
 
         Usage:
+            management version
             management user generate [--count=N]
             management user list [USERNAME] [--format=FORMAT]
             management user add [YAMLFILE]
+            management user delete [USERNAME]
+            management user clear
+            management user status USERNAME
             management user approve [USERNAME]
             management user activate [USERNAME]
             management user suspend [USERNAME]
             management user block [USERNAME]
             management user deny [USERNAME]
-            management user delete [USERNAME]
-            management user clear
-            management user status USERNAME
-            management user projects USERNAME
             management user password USERNAME PASSWORD
+            management user projects USERNAME
             management project generate [--count=N]
             management project list [PROJECTID] [--format=FORMAT]
-            management project clear
+            management project add [YAMLFILE]
             management project delete [PROJECTID]
+            management project clear
             management project status [PROJECTID]
             management project activate [PROJECTID]
             management project deactivate [PROJECTID]
             management project close [PROJECTID]
             management project add member [USERNAME] [PROJECTID] [ROLE]
             management project remove member [USERNAME] [PROJECTID]
-            management version
 
         Options:
             --help          Show this screen
@@ -61,6 +60,12 @@ class cm_account_admin:
         try:
             if arguments['version']:
                 Console.info("Version: " + get_version())
+            elif arguments['user'] and arguments['generate']:
+                if arguments['--count']:
+                    count = int(arguments['--count'])
+                    generate_users(count)
+                else:
+                    generate_users(10)
             elif arguments['user'] and arguments['list']:
                 user = Users()
                 display_fmt = None
@@ -70,25 +75,21 @@ class cm_account_admin:
                 if arguments['USERNAME']:
                     user_name = arguments['USERNAME']
                 user.list_users(display_fmt, user_name)
-            elif arguments['user'] and arguments['generate']:
-                if arguments['--count']:
-                    count = int(arguments['--count'])
-                    generate_users(count)
-                    Console.info(str(count)+" users generated.")
-                else:
-                    generate_users(10)
-                    Console.info("10 users generated.")
-            elif arguments['user'] and arguments['clear']:
+            elif arguments['user'] and arguments['add']:
                 user = Users()
-                user.clear()
-                Console.info("Users cleared from the database.")
+                user.create_user_from_file(arguments['YAMLFILE'])
             elif arguments['user'] and arguments['delete']:
                 if arguments['USERNAME']:
                     user = Users()
                     user.delete_user(arguments['USERNAME'])
-                    Console.info("User "+arguments['USERNAME']+" removed from the database.")
                 else:
                     Console.error("Please specify a user to be removed")
+            elif arguments['user'] and arguments['clear']:
+                user = Users()
+                user.clear()
+            elif arguments['user'] and arguments['status']:
+                user = Users()
+                Console.info("Status of user "+arguments['USERNAME']+" "+user.get_user_status(arguments['USERNAME']))
             elif arguments['user'] and arguments['approve']:
                 if arguments['USERNAME']:
                     user = Users()
@@ -124,12 +125,6 @@ class cm_account_admin:
                     Console.info("User "+arguments['USERNAME']+" denied.")
                 else:
                     Console.error("Please specify a user to be amended")
-            elif arguments['user'] and arguments['status']:
-                user = Users()
-                Console.info("Status of user "+arguments['USERNAME']+" "+user.get_user_status(arguments['USERNAME']))
-            elif arguments['user'] and arguments['add']:
-                user = Users()
-                user.create_user_from_file(arguments['YAMLFILE'])
             elif arguments['user'] and arguments['password']:
                 user = Users()
                 user.set_password(arguments['USERNAME'], arguments['PASSWORD'])
@@ -156,22 +151,19 @@ class cm_account_admin:
                 if arguments['PROJECTID']:
                     project_id = arguments['PROJECTID']
                 project.list_projects(display_fmt, project_id)
-            elif arguments['project'] and arguments['clear']:
+            elif arguments['project'] and arguments['add']:
                 project = Projects()
-                project.clear()
-                Console.info("Projects cleared from the database.")
+                project.create_project_from_file(arguments['YAMLFILE'])
             elif arguments['project'] and arguments['delete']:
                 if arguments['PROJECTID']:
                     project = Projects()
                     project.delete_project(arguments['PROJECTID'])
                 else:
                     Console.error("Please specify a project id to be removed")
-            elif arguments['project'] and arguments['add'] and arguments['member']:
+            elif arguments['project'] and arguments['clear']:
                 project = Projects()
-                project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
-            elif arguments['project'] and arguments['remove'] and arguments['member']:
-                project = Projects()
-                project.remove_user(arguments['USERNAME'], arguments['PROJECTID'])
+                project.clear()
+                Console.info("Projects cleared from the database.")
             elif arguments['project'] and arguments['status']:
                 project = Projects()
                 Console.info("Status of project is: "+project.get_project_status(arguments['PROJECTID']))
@@ -196,6 +188,12 @@ class cm_account_admin:
                     Console.info("Project "+arguments['PROJECTID']+" closed.")
                 else:
                     Console.error("Please specify a project to be amended")
+            elif arguments['project'] and arguments['add'] and arguments['member']:
+                project = Projects()
+                project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
+            elif arguments['project'] and arguments['remove'] and arguments['member']:
+                project = Projects()
+                project.remove_user(arguments['USERNAME'], arguments['PROJECTID'])
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)

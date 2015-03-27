@@ -1,10 +1,9 @@
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
+from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
-from cloudmesh_management.base_classes import SubUser, SubUser, Project
-# from tabulate import tabulate
+from cloudmesh_management.base_classes import SubUser, Project
 from passlib.hash import sha256_crypt
 from bson.objectid import ObjectId
 import yaml
@@ -76,7 +75,7 @@ class Users(object):
         if db_name:
             meta = {'db_alias': db_name}
 
-        #         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
+            # get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 
     @classmethod
     def objects(cls):
@@ -124,6 +123,7 @@ class Users(object):
                 user = SubUser.objects(username=user_name)
                 if user:
                     user.delete()
+                    Console.info("User " + user_name + " removed from the database.")
                 else:
                     Console.error("User with the name '{0}' does not exist.".format(user_name))
             except:
@@ -238,14 +238,17 @@ class Users(object):
         """
         Removes all elements form the mongo db that are users
         """
-        for user in SubUser.objects:
-            user.delete()
-
+        try:
+            for user in SubUser.objects:
+                user.delete()
+            Console.info("Users cleared from the database.")
+        except:
+            Console.error("Oops! Something went wrong while trying to clear the users from database")
 
     @classmethod
     def list_users(cls, disp_fmt=None, username=None):
         # req_fields = ["username", "title", "firstname", "lastname",
-        #               "email", "phone", "url", "citizenship",
+        # "email", "phone", "url", "citizenship",
         #               "institution", "institutionrole", "department",
         #               "advisor", "address", "status", "projects"]
         req_fields = ["username", "firstname", "lastname",
@@ -275,11 +278,11 @@ class Users(object):
                     else:
                         Console.error("User not in the database.")
         except:
-            Console.error("Oops.. Something went wrong in the list users method "+sys.exc_info()[0])
+            Console.error("Oops.. Something went wrong in the list users method " + sys.exc_info()[0])
 
     @classmethod
     def list_projects(cls, user_name=None):
-        required_fields=["username", "firstname", "lastname", "projects"]
+        required_fields = ["username", "firstname", "lastname", "projects"]
         try:
             if user_name:
                 user_json = SubUser.objects.only(*required_fields).to_json()
@@ -305,8 +308,9 @@ class Users(object):
                         project_entry = ""
                         if value:
                             for itm in value:
-                                user_project = Project.objects(id=ObjectId(itm.get('$oid'))).only('title', 'project_id').first()
-                                project_entry = project_entry+user_project.title +", "
+                                user_project = Project.objects(id=ObjectId(itm.get('$oid'))).only('title',
+                                                                                                  'project_id').first()
+                                project_entry = project_entry + user_project.title + ", "
                         items.append(project_entry)
                     else:
                         items.append(value)
@@ -333,9 +337,9 @@ class Users(object):
                             if key == "projects":
                                 project_entry = ""
                                 for itm in value:
-                                    user_project = Project.objects(id=ObjectId(itm.get('$oid')))\
+                                    user_project = Project.objects(id=ObjectId(itm.get('$oid'))) \
                                         .only('title', 'project_id').first()
-                                    project_entry = project_entry+user_project.title + ", "
+                                    project_entry = project_entry + user_project.title + ", "
                                 project_entry.strip(', ')
                                 items.append(project_entry)
                             else:
@@ -371,19 +375,19 @@ class Users(object):
             return
 
         try:
-            user_config = file_config.get("cloudmesh","user")
+            user_config = file_config.get("cloudmesh", "user")
         except:
             Console.error("Could not get user information from yaml file, "
-                      "please check you yaml file, users information must be "
-                      "under 'cloudmesh' -> 'users' -> user1...")
+                          "please check you yaml file, users information must be "
+                          "under 'cloudmesh' -> 'users' -> user1...")
             return
 
         try:
             user_name = user_config['username']
-            user_string = "User("
+            user_string = "SubUser("
             for key in user_config:
                 # print key, " - ", user_config[key]
-                user_string = user_string+key+"="+"\""+user_config[key]+"\","
+                user_string = user_string + key + "=" + "\"" + user_config[key] + "\","
             user_string += "status=\"pending\","
             user_string += ")"
             data = eval(user_string)
@@ -396,15 +400,15 @@ class Users(object):
                 cls.add(data)
                 Console.info("User created in the database.")
             else:
-                Console.error("User with user name "+user_name+" already exists.")
+                Console.error("User with user name " + user_name + " already exists.")
                 return
         except:
-            Console.error("User creation in database failed, "+str(sys.exc_info()[0]))
+            Console.error("User creation in database failed, " + str(sys.exc_info()[0]))
             return
 
     @classmethod
     def check_exists(cls, user_name):
-        return SubUser.objects(username=user_name) > 0
+        return len(SubUser.objects(username=user_name)) > 0
 
     @classmethod
     def set_password(cls, user_name, passwd):

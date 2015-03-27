@@ -1,7 +1,8 @@
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_management.project import Projects
 from cloudmesh_management.user import Users
-from cloudmesh_management.base_classes import SubUser, Project, SubUser
+from cloudmesh_management.base_classes import Project, SubUser
+from cmd3.console import Console
 from faker import Factory
 from pprint import pprint
 import uuid
@@ -65,6 +66,7 @@ def generate_users(n):
     for i in range(0, n):
         data = random_user()
         users.add(data)
+    Console.info(str(n)+" users generated.")
 
 
 def random_project():

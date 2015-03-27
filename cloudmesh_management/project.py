@@ -1,18 +1,20 @@
-from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
-from cloudmesh_management.base_classes import User, Project, SubUser
-from cloudmesh_base.tables import two_column_table
-from cmd3.console import Console
-from tabulate import tabulate
-from prettytable import PrettyTable
-from texttable import Texttable
 import json
-from bson.objectid import ObjectId
 import uuid
 import sys
 
+from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
+from cloudmesh_base.ConfigDict import ConfigDict
+from cloudmesh_base.util import path_expand
+from cmd3.console import Console
+from tabulate import tabulate
+from texttable import Texttable
+from bson.objectid import ObjectId
+from cloudmesh_management.base_classes import User, Project, SubUser
+
 
 def implement():
-    print "IMPLEMENT ME"
+    print "TO BE IMPLEMENTED"
+    return
 
 
 class Projects(object):
@@ -176,6 +178,44 @@ class Projects(object):
         project.save()
 
     @classmethod
+    def create_project_from_file(cls, file_path):
+        implement()
+        return
+
+        # try:
+        #     filename = path_expand(file_path)
+        #     file_config = ConfigDict(filename=filename)
+        # except:
+        #     Console.error("Could not load file, please check filename and its path")
+        #     return
+        #
+        # try:
+        #     project_config = file_config.get("cloudmesh", "project")
+        # except:
+        #     Console.error("Could not get project information from yaml file, "
+        #                   "please check you yaml file, users information must be "
+        #                   "under 'cloudmesh' -> 'project' -> project1...")
+        #     return
+        #
+        # project_id=uuid.uuid4()
+        # project_string = "Project("
+        # for key in project_config:
+        #     project_string = project_string + key + "=" + str(project_config[key]) + ","
+        # project_string += "project_id="+str(project_id)+","
+        # project_string += "status=pending"
+        # project_string += ")"
+        # print project_string
+        # try:
+        #     data = eval(project_string)
+        #     # print data
+        #     cls.add(data)
+        #     Console.info("Project created in the database.")
+        # except:
+        #     Console.error("Project creation in database failed, " + str(sys.exc_info()[0]))
+        #     return
+
+
+    @classmethod
     def list_projects(cls, display_fmt=None, project_id=None):
         req_fields = ["title", "status", "lead", "managers", "members", "project_id"]
         try:
@@ -196,7 +236,7 @@ class Projects(object):
                     projects_dict = item
                 cls.display_two_column(projects_dict)
         except:
-            Console.error("Oops.. Something went wrong in the list projects method "+sys.exc_info()[0])
+            Console.error("Oops.. Something went wrong in the list projects method " + sys.exc_info()[0])
         pass
 
 
@@ -213,15 +253,15 @@ class Projects(object):
                     # managers, lead, project_id, members,
                     if key == "lead":
                         user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
-                        lead_name = user.firstname+" "+user.lastname
+                        lead_name = user.firstname + " " + user.lastname
                         items.append(key.replace('_', ' ').title())
                         items.append(lead_name)
                         rows.append(items)
                     elif key == "members":
-                        entry=""
+                        entry = ""
                         for item in value:
                             user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname+" "+user.lastname+","
+                            entry += user.firstname + " " + user.lastname + ","
                         entry = entry.strip(',')
                         items.append(key.replace('_', ' ').title())
                         items.append(entry)
@@ -230,19 +270,19 @@ class Projects(object):
                         entry = ""
                         for item in value:
                             user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname+" "+user.lastname+","
+                            entry += user.firstname + " " + user.lastname + ","
                         entry = entry.strip(',')
                         items.append(key.replace('_', ' ').title())
                         items.append(entry.encode('ascii', 'ignore'))
                         rows.append(items)
                     elif key == "project_id":
                         items.append(key.replace('_', ' ').title(), )
-                        items.append(value.get('$uuid').encode('ascii','ignore'))
+                        items.append(value.get('$uuid').encode('ascii', 'ignore'))
                         rows.append(items)
                     else:
                         items.append(key.replace('_', ' ').title())
-                        if(key in ['agreement_software', 'agreement_documentation', 'join_notification',
-                                   'agreement_slides', 'join_open', 'agreement_support', ]):
+                        if (key in ['agreement_software', 'agreement_documentation', 'join_notification',
+                                    'agreement_slides', 'join_open', 'agreement_support', ]):
                             if isinstance(value, list):
                                 items.append(' , '.join(value))
                             else:
@@ -274,24 +314,24 @@ class Projects(object):
                 for key, value in entry.iteritems():
                     if key == "lead":
                         user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
-                        lead_name = user.firstname+" "+user.lastname
+                        lead_name = user.firstname + " " + user.lastname
                         items.append(lead_name)
                     elif key == "members":
-                        entry=""
+                        entry = ""
                         for item in value:
                             user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname+" "+user.lastname+","
+                            entry += user.firstname + " " + user.lastname + ","
                         entry = entry.strip(',')
                         items.append(entry)
                     elif key == "managers":
-                        entry=""
+                        entry = ""
                         for item in value:
                             user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname+" "+user.lastname+","
+                            entry += user.firstname + " " + user.lastname + ","
                         entry = entry.strip(',')
                         items.append(entry)
                     elif key == "project_id":
-                        items.append(value.get('$uuid').encode('ascii','ignore'))
+                        items.append(value.get('$uuid').encode('ascii', 'ignore'))
                     else:
                         items.append(value)
                     headers.append(key.replace('_', ' ').title())

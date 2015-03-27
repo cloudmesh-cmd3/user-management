@@ -19,7 +19,8 @@ requirements = [
     'tabulate',
     'cmd3',
     'fake-factory',
-    'passlib'
+    'passlib',
+    'texttable'
 ]
 
 import os

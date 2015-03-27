@@ -1,0 +1,46 @@
+meta:
+    yaml_version: 2.1
+    kind: management
+cloudmesh:
+    project:
+        title: Testing Apache Cluster
+        categories: ['FutureSystems']
+        keywords: ['sqllite']
+        lead: user
+        managers: [user]
+        members: [user]
+        alumnis: [fake.name()]
+        contact: fake.name()
+        orientation: "Lot's of all make"
+        primary_discipline: "other"
+        abstract: fake.paragraph()
+        intellectual_merit: fake.paragraph()
+        broader_impact: fake.paragraph()
+        url: fake.url()
+        results: fake.sentence()
+        agreement_user: True
+        agreement_slides: True
+        agreement_support: True
+        agreement_software: True
+        agreement_documentation: True
+        grant_organization: "NSF"
+        grant_id: "1001"
+        grant_url: fake.url()
+        resources_services: ['hadoop', 'mapreduce', 'openstack']
+        resources_software: ['other']
+        resources_clusters: ['india']
+        resources_provision: ['paas']
+        comment: fake.sentence()
+        use_of_fg: fake.paragraph()
+        scale_of_use: fake.paragraph()
+        comments: fake.sentence()
+        join_open: True
+        join_notification: True
+        loc_name: fake.country()
+        loc_street: fake.street_name()
+        loc_additional: "None"
+        loc_state: fake.state()
+        loc_country: fake.country()
+        active: False
+
+
