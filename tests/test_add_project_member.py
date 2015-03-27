@@ -4,7 +4,7 @@ from cloudmesh_base.util import HEADING
 from cloudmesh_base.util import banner
 
 from cloudmesh_management.project import Project, Projects
-from cloudmesh_management.user import User
+from cloudmesh_management.user import SubUser
 
 
 class TestGenerate:

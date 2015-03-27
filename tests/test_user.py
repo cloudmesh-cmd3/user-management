@@ -1,4 +1,4 @@
-from cloudmesh_management.user import User, Users
+from cloudmesh_management.user import SubUser, Users
 import mongoengine
 from cloudmesh_management.cloudmeshobject import order, make_form_list
 from pprint import pprint
@@ -22,7 +22,7 @@ class TestUser:
         users = Users()
         users.clear()
 
-        pprint (User.__dict__.keys())
+        pprint (SubUser.__dict__.keys())
 
     def test_list(self):
         HEADING()
@@ -34,7 +34,7 @@ class TestUser:
     def test_user_Gregor(self):
         HEADING()
 
-        gregor = User(
+        gregor = SubUser(
             title = "",
             firstname = "Gregor",
             lastname = "von Laszewski",

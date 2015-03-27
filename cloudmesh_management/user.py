@@ -1,14 +1,16 @@
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_management.base_classes import User
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.locations import config_file
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
-from tabulate import tabulate
+from cloudmesh_management.base_classes import SubUser, SubUser, Project
+# from tabulate import tabulate
 from passlib.hash import sha256_crypt
+from bson.objectid import ObjectId
 import yaml
 import json
 import sys
+from texttable import Texttable
 
 STATUS = ('pending', 'approved', 'blocked', 'denied', 'active', 'suspended')
 
@@ -34,7 +36,7 @@ def read_user(filename):
     """
     stream = open(filename, 'r')
     data = yaml.load(stream)
-    user = User(
+    user = SubUser(
         status=data["status"],
         username=data["username"],
         title=data["title"],
@@ -68,7 +70,7 @@ class Users(object):
         port = config['cloudmesh']['server']['mongo']['port']
 
         # db = connect('manage', port=port)
-        self.users = User.objects()
+        self.users = SubUser.objects()
 
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
@@ -93,10 +95,10 @@ class Users(object):
         """
         new_proposal = proposal.lower()
         num = 1
-        username = User.objects(username=new_proposal)
+        username = SubUser.objects(username=new_proposal)
         while username.count() > 0:
             new_proposal = proposal + str(num)
-            username = User.objects(username=new_proposal)
+            username = SubUser.objects(username=new_proposal)
             num += 1
         return new_proposal
 
@@ -119,7 +121,7 @@ class Users(object):
     def delete_user(cls, user_name=None):
         if user_name:
             try:
-                user = User.objects(username=user_name)
+                user = SubUser.objects(username=user_name)
                 if user:
                     user.delete()
                 else:
@@ -170,7 +172,7 @@ class Users(object):
     def set_user_status(cls, user_name, status):
         if user_name:
             try:
-                User.objects(username=user_name).update_one(set__status=status)
+                SubUser.objects(username=user_name).update_one(set__status=status)
             except:
                 Console.error("Oops! Something went wrong while trying to amend user status")
         else:
@@ -181,7 +183,7 @@ class Users(object):
     def get_user_status(cls, user_name):
         if user_name:
             try:
-                user = User.objects(username=user_name).only('status')
+                user = SubUser.objects(username=user_name).only('status')
                 if user:
                     for entry in user:
                         return entry.status
@@ -198,7 +200,7 @@ class Users(object):
         :param email: email id of the user
         :return: true or false
         """
-        user = User.objects(email=email)
+        user = SubUser.objects(email=email)
         valid = user.count() == 0
         return valid
 
@@ -213,11 +215,11 @@ class Users(object):
         :type email: email address
         """
         if email is None:
-            return User.objects()
+            return SubUser.objects()
         else:
-            found = User.objects(email=email)
+            found = SubUser.objects(email=email)
             if found.count() > 0:
-                return User.objects()[0]
+                return SubUser.objects()[0]
             else:
                 return None
 
@@ -229,26 +231,29 @@ class Users(object):
         :param username:
         :type username:
         """
-        return User.object(username=username)
+        return SubUser.object(username=username)
 
     @classmethod
     def clear(cls):
         """
         Removes all elements form the mongo db that are users
         """
-        for user in User.objects:
+        for user in SubUser.objects:
             user.delete()
 
 
     @classmethod
     def list_users(cls, disp_fmt=None, username=None):
-        req_fields = ["username", "title", "firstname", "lastname",
-                      "email", "phone", "url", "citizenship",
-                      "institution", "institutionrole", "department",
-                      "advisor", "address", "status"]
+        # req_fields = ["username", "title", "firstname", "lastname",
+        #               "email", "phone", "url", "citizenship",
+        #               "institution", "institutionrole", "department",
+        #               "advisor", "address", "status", "projects"]
+        req_fields = ["username", "firstname", "lastname",
+                      "email", "phone", "institution", "institutionrole",
+                      "advisor", "address", "status", "projects"]
         try:
             if username is None:
-                user_json = User.objects.only(*req_fields).to_json()
+                user_json = SubUser.objects.only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
                     if disp_fmt != 'json':
@@ -258,15 +263,17 @@ class Users(object):
                 else:
                     Console.error("No users in the database.")
             else:
-                user_json = User.objects(username=username).only(*req_fields).to_json()
-                user_dict = json.loads(user_json)
-                if user_dict:
-                    if disp_fmt != 'json':
-                        cls.display(user_dict, username)
+                user_json = SubUser.objects(username=username).to_json()
+                users_list = json.loads(user_json)
+                for item in users_list:
+                    users_dict = item
+                    if users_dict:
+                        if disp_fmt != 'json':
+                            cls.display_two_columns(users_dict)
+                        else:
+                            cls.display_json(users_dict, username)
                     else:
-                        cls.display_json(user_dict, username)
-                else:
-                    Console.error("No users in the database.")
+                        Console.error("User not in the database.")
         except:
             Console.error("Oops.. Something went wrong in the list users method "+sys.exc_info()[0])
 
@@ -275,7 +282,7 @@ class Users(object):
         required_fields=["username", "firstname", "lastname", "projects"]
         try:
             if user_name:
-                user_json = User.objects.only(*required_fields).to_json()
+                user_json = SubUser.objects.only(*required_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
                     cls.display(user_dict, user_name)
@@ -284,36 +291,71 @@ class Users(object):
         except:
             Console.error("Please provide a username.")
 
+
     @classmethod
     def display(cls, user_dicts=None, user_name=None):
         if bool(user_dicts):
             values = []
+            table = Texttable(max_width=180)
             for entry in user_dicts:
                 items = []
                 headers = []
                 for key, value in entry.iteritems():
-                    items.append(value)
+                    if key == "projects":
+                        project_entry = ""
+                        if value:
+                            for itm in value:
+                                user_project = Project.objects(id=ObjectId(itm.get('$oid'))).only('title', 'project_id').first()
+                                project_entry = project_entry+user_project.title +", "
+                        items.append(project_entry)
+                    else:
+                        items.append(value)
                     headers.append(key.replace('_', ' ').title())
                 values.append(items)
-            table_fmt = "orgtbl"
-            table = tabulate(values, headers, table_fmt)
-            separator = ''
-            try:
-                seperator = table.split("\n")[1].replace("|", "+")
-            except:
-                separator = "-" * 50
-            print separator
-            print table
-            print separator
+                table.add_row(items)
+            table.header(headers)
+            print table.draw()
         else:
             if user_name:
                 Console.error("No user in the system with name '{0}'".format(user_name))
 
+    @classmethod
+    def display_two_columns(cls, table_dict=None):
+        if table_dict:
+            ignore_fields = ['_cls', '_id', 'date_modified', 'date_created', 'password', 'confirm']
+            table = Texttable(max_width=100)
+            rows = [['Property', 'Value']]
+            for key, value in table_dict.iteritems():
+                if key not in ignore_fields:
+                    items = [key.replace('_', ' ').title()]
+                    if isinstance(value, list):
+                        if value:
+                            if key == "projects":
+                                project_entry = ""
+                                for itm in value:
+                                    user_project = Project.objects(id=ObjectId(itm.get('$oid')))\
+                                        .only('title', 'project_id').first()
+                                    project_entry = project_entry+user_project.title + ", "
+                                project_entry.strip(', ')
+                                items.append(project_entry)
+                            else:
+                                items.append(' , '.join(value))
+                        else:
+                            items.append('None')
+                    else:
+                        items.append(value)
+                    rows.append(items)
+            try:
+                if rows:
+                    table.add_rows(rows)
+            except:
+                print sys.exc_info()[0]
+            print table.draw()
+        pass
 
     @classmethod
     def display_json(cls, user_dict=None, user_name=None):
         if bool(user_dict):
-            # pprint.pprint(user_json)
             print json.dumps(user_dict, indent=4)
         else:
             if user_name:
@@ -362,13 +404,13 @@ class Users(object):
 
     @classmethod
     def check_exists(cls, user_name):
-        return User.objects(username=user_name) > 0
+        return SubUser.objects(username=user_name) > 0
 
     @classmethod
     def set_password(cls, user_name, passwd):
         pass_hash = sha256_crypt.encrypt(passwd)
         try:
-            User.objects(username=user_name).update_one(set__password=pass_hash)
+            SubUser.objects(username=user_name).update_one(set__password=pass_hash)
             Console.info("User password updated.")
         except:
             Console.error("Oops! Something went wrong while trying to set user password")

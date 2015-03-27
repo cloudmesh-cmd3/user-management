@@ -1,4 +1,4 @@
-from cloudmesh_management.user import User
+from cloudmesh_management.user import SubUser
 # from management import Account
 # from projects import project_information
 # from projects import resource_requirement

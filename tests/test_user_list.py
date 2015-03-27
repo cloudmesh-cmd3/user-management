@@ -1,10 +1,6 @@
-from pprint import pprint
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
-from cloudmesh_base.util import banner
-
-from cloudmesh_management.project import Project, Projects
-from cloudmesh_management.user import SubUser
+from cloudmesh_management.user import Users
 
 
 class TestGenerate:
@@ -28,10 +24,10 @@ class TestGenerate:
     def test_generate(self):
         HEADING()
 
-        project = Projects()
+        user = Users()
         display_fmt='json'
-        project_id = '7c188052cf034021a938fdbc3c608a2e'
-        project.list_projects(project_id=project_id)
+        user_name = 'gregg'
+        user.list_users(disp_fmt='json', username=user_name)
 
 
 

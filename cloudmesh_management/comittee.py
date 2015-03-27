@@ -1,7 +1,7 @@
 from mongoengine import *
 from datetime import datetime
 from project import Project, Projects
-from user import User, Users
+from user import SubUser, Users
 
 port = 27777
 db_name = 'project'
@@ -24,7 +24,7 @@ CHOICES = ('Yes', 'No')
 class Committee(Document):
     status = StringField(choices=STATUS)
     projects = ListField(StringField())
-    reviewers = ListField(ReferenceField(User), default=[])
+    reviewers = ListField(ReferenceField(SubUser), default=[])
     reviews = StringField()
     # --------------------------------------------------------------------
     # Default value showing if this is the first time the project is being applied for or not

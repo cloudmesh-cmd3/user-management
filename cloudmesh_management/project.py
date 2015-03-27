@@ -1,7 +1,10 @@
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
-from cloudmesh_management.base_classes import User, Project
+from cloudmesh_management.base_classes import User, Project, SubUser
+from cloudmesh_base.tables import two_column_table
 from cmd3.console import Console
 from tabulate import tabulate
+from prettytable import PrettyTable
+from texttable import Texttable
 import json
 from bson.objectid import ObjectId
 import uuid
@@ -20,7 +23,7 @@ class Projects(object):
     def __init__(self):
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         self.projects = Project.objects()
-        self.users = User.objects()
+        self.users = SubUser.objects()
 
     def __str__(self):
         """
@@ -62,13 +65,13 @@ class Projects(object):
         :type project: uuid
         """
         """adds members to a particular project"""
-        user = User.objects(username=user_name).first()
+        user = SubUser.objects(username=user_name).first()
         project = Project.objects(project_id=project_id).first()
         if project:
             if user and role != 'alumni':
                 if role == "member":
                     Project.objects(project_id=project_id).update_one(push__members=user)
-                    User.objects(username=user_name).update_one(push_projects=project)
+                    SubUser.objects(username=user_name).update_one(push__projects=project)
                     Console.info("User `{0}` added as Project member.".format(user_name))
                 elif role == "lead":
                     Project.objects(project_id=project_id).update_one(set__lead=user)
@@ -85,7 +88,7 @@ class Projects(object):
 
     @classmethod
     def remove_user(cls, user_name, project_id):
-        user = User.objects(username=user_name).first()
+        user = SubUser.objects(username=user_name).first()
         if user:
             Project.objects(project_id=project_id).update_one(pull__members=user)
             Console.info("User `{0}` removed as Project member.".format(user_name))
@@ -186,8 +189,79 @@ class Projects(object):
                         cls.display_json(projects_dict, project_id)
                 else:
                     Console.error("No projects in the database.")
+            else:
+                projects_json = Project.objects(project_id=project_id).to_json()
+                projects_list = json.loads(projects_json)
+                for item in projects_list:
+                    projects_dict = item
+                cls.display_two_column(projects_dict)
         except:
             Console.error("Oops.. Something went wrong in the list projects method "+sys.exc_info()[0])
+        pass
+
+
+    @classmethod
+    def display_two_column(cls, table_dict=None):
+        if table_dict:
+            ignore_fields = ['_cls', '_id', 'date_modified', 'date_created']
+            table = Texttable(max_width=100)
+            rows = [['Property', 'Value']]
+            for key, value in table_dict.iteritems():
+                if key not in ignore_fields:
+                    items = []
+                    # print key, " - ", value
+                    # managers, lead, project_id, members,
+                    if key == "lead":
+                        user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
+                        lead_name = user.firstname+" "+user.lastname
+                        items.append(key.replace('_', ' ').title())
+                        items.append(lead_name)
+                        rows.append(items)
+                    elif key == "members":
+                        entry=""
+                        for item in value:
+                            user = User.objects.get(id=ObjectId(item.get('$oid')))
+                            entry += user.firstname+" "+user.lastname+","
+                        entry = entry.strip(',')
+                        items.append(key.replace('_', ' ').title())
+                        items.append(entry)
+                        rows.append(items)
+                    elif key == "managers":
+                        entry = ""
+                        for item in value:
+                            user = User.objects.get(id=ObjectId(item.get('$oid')))
+                            entry += user.firstname+" "+user.lastname+","
+                        entry = entry.strip(',')
+                        items.append(key.replace('_', ' ').title())
+                        items.append(entry.encode('ascii', 'ignore'))
+                        rows.append(items)
+                    elif key == "project_id":
+                        items.append(key.replace('_', ' ').title(), )
+                        items.append(value.get('$uuid').encode('ascii','ignore'))
+                        rows.append(items)
+                    else:
+                        items.append(key.replace('_', ' ').title())
+                        if(key in ['agreement_software', 'agreement_documentation', 'join_notification',
+                                   'agreement_slides', 'join_open', 'agreement_support', ]):
+                            if isinstance(value, list):
+                                items.append(' , '.join(value))
+                            else:
+                                if value == 1:
+                                    items.append("True")
+                                else:
+                                    items.append(("False"))
+                        else:
+                            if isinstance(value, list):
+                                items.append(' , '.join(value))
+                            else:
+                                items.append(value)
+                        rows.append(items)
+            try:
+                if rows:
+                    table.add_rows(rows)
+            except:
+                print sys.exc_info()[0]
+            print table.draw()
         pass
 
     @classmethod
@@ -199,7 +273,7 @@ class Projects(object):
                 headers = []
                 for key, value in entry.iteritems():
                     if key == "lead":
-                        user = User.objects.get(id=ObjectId(value.get('$oid')))
+                        user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
                         lead_name = user.firstname+" "+user.lastname
                         items.append(lead_name)
                     elif key == "members":
@@ -212,8 +286,9 @@ class Projects(object):
                     elif key == "managers":
                         entry=""
                         for item in value:
-                            entry += item.encode('ascii','ignore')
-                        entry = entry.strip(', ')
+                            user = User.objects.get(id=ObjectId(item.get('$oid')))
+                            entry += user.firstname+" "+user.lastname+","
+                        entry = entry.strip(',')
                         items.append(entry)
                     elif key == "project_id":
                         items.append(value.get('$uuid').encode('ascii','ignore'))
@@ -221,7 +296,7 @@ class Projects(object):
                         items.append(value)
                     headers.append(key.replace('_', ' ').title())
                 values.append(items)
-            table_fmt = "orgtbl"
+            table_fmt = "fancy_grid"
             table = tabulate(values, headers, table_fmt)
             separator = ''
             try:

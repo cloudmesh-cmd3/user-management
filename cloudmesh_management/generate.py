@@ -1,7 +1,7 @@
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_management.project import Projects
 from cloudmesh_management.user import Users
-from cloudmesh_management.base_classes import User, Project
+from cloudmesh_management.base_classes import SubUser, Project, SubUser
 from faker import Factory
 from pprint import pprint
 import uuid
@@ -26,10 +26,9 @@ def random_user():
 
     :rtype: dict
     """
-    project = Project.objects.first()
     firstname = fake.first_name()
     prefix = fake.prefix()
-    data = User(
+    data = SubUser(
         status="pending",
         title=prefix[0],
         firstname=firstname,
@@ -49,7 +48,7 @@ def random_user():
         url=fake.url(),
         advisor=fake.name(),
         confirm=fake.word(),
-        projects=[project],
+        projects=[],
     )
     return data
 
@@ -74,14 +73,14 @@ def random_project():
     
     :rtype: dict
     """
-    user = User.objects.first()
+    user = SubUser.objects.first()
 
     data = Project(
         title=fake.sentence()[:30],
-        categories=['FutureGrid'],
+        categories=['FutureSystems'],
         keywords=['sqllite'],
         lead=user,
-        managers=[fake.name()],
+        managers=[user],
         members=[user],
         alumnis=[fake.name()],
         contact=fake.name() + "\n" + fake.address(),

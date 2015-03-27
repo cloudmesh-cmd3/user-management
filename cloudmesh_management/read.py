@@ -4,7 +4,7 @@ import datetime, time
 import hashlib, uuid
 import yaml
 from pprint import pprint
-from user import User, Users
+from user import SubUser, Users
 from cloudmesh_management.generate import random_user
 from cloudmesh_management.user import read_user
 
@@ -26,7 +26,7 @@ def main():
 
 
     print 70 * "="
-    user = User()
+    user = SubUser()
     user = read_user(FILENAME)
 
     print 70 * "="
@@ -35,7 +35,7 @@ def main():
 
     user.update(**{"set__username": "Hallo"})
     user.save()
-    print User.objects(username="Hallo")
+    print SubUser.objects(username="Hallo")
 
 
 if __name__ == "__main__":

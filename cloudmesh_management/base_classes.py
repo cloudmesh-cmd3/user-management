@@ -166,7 +166,7 @@ class User(CloudmeshObject):
 
 STATUS = ('pending', 'approved', 'completed', 'denied')
 
-CATEGORY = ('Database', 'FutureGrid', 'other')
+CATEGORY = ('Database', 'FutureSystems', 'other')
 
 DISCIPLINE = ('other')
 # see https://ncsesdata.nsf.gov/nsf/srs/webcasp/data/gradstud.htm
@@ -281,7 +281,7 @@ class Project(CloudmeshObject):
 
     # lead_institutional_role =  StringField(choices=INSTITUTE_ROLE, required=REQUIRED)
     lead = ReferenceField(User)
-    managers = ListField(StringField())
+    managers = ListField(ReferenceField(User))
     members = ListField(ReferenceField(User))
     alumnis = ListField(StringField())
     contact = StringField(required=REQUIRED)
@@ -419,4 +419,6 @@ class Project(CloudmeshObject):
         d = self.to_json()
         return str(d)
 
-User.projects = ListField(ReferenceField(Project))
+
+class SubUser(User):
+    projects = ListField(ReferenceField(Project))
