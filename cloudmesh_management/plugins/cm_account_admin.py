@@ -52,7 +52,7 @@ class cm_account_admin:
             management version
 
         Options:
-            -h --help       Show this screen
+            --help          Show this screen
             --format=json   Show the user details in json format
         """
 
