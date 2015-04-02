@@ -38,6 +38,7 @@ class User(CloudmeshObject):
     advisor = StringField(required=True)
     country = StringField(required=True)
 
+
     """
     Hidden fields
     """
@@ -280,10 +281,10 @@ class Project(CloudmeshObject):
     # -------------------------------------------------------------------
 
     # lead_institutional_role =  StringField(choices=INSTITUTE_ROLE, required=REQUIRED)
-    lead = ReferenceField(User)
+    lead = ListField(ReferenceField(User))
     managers = ListField(ReferenceField(User))
     members = ListField(ReferenceField(User))
-    alumnis = ListField(StringField())
+    alumnis = ListField(StringField(), default=None)
     contact = StringField(required=REQUIRED)
     # active_members = lead u managers u members - alumnis
     # if not active : active_members = None
@@ -303,11 +304,11 @@ class Project(CloudmeshObject):
     # -------------------------------------------------------------------
     # Agreements
     # -------------------------------------------------------------------
-    agreement_use = BooleanField()
-    agreement_slides = BooleanField()
-    agreement_support = BooleanField()
-    agreement_software = BooleanField()
-    agreement_documentation = BooleanField()
+    agreement_use = BooleanField(default=True)
+    agreement_slides = BooleanField(default=True)
+    agreement_support = BooleanField(default=True)
+    agreement_software = BooleanField(default=True)
+    agreement_documentation = BooleanField(default=True)
 
     # -------------------------------------------------------------------
     # Grant Information

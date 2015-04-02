@@ -10,11 +10,39 @@ from tabulate import tabulate
 from texttable import Texttable
 from bson.objectid import ObjectId
 from cloudmesh_management.base_classes import User, Project, SubUser
+from mongoengine import fields
 
+ROLES_LIST = ["lead", "member", "alumni"]
 
 def implement():
     print "TO BE IMPLEMENTED"
     return
+
+
+def update_document(document, data_dict):
+    def field_value(field, value):
+        if field.__class__ in (fields.ListField, fields.SortedListField):
+            if value:
+                return str(value).split(", ")
+            else:
+                return []
+
+        if field.__class__ in (
+            fields.EmbeddedDocumentField,
+            fields.GenericEmbeddedDocumentField,
+            fields.ReferenceField,
+            fields.GenericReferenceField
+        ):
+            pass
+            # return field.document_type(**value)
+        else:
+            return value
+
+    [setattr(
+        document, key,
+        field_value(document._fields[key], value)
+    ) for key, value in data_dict.items()]
+    return document
 
 
 class Projects(object):
@@ -66,6 +94,11 @@ class Projects(object):
         :param project: the project id
         :type project: uuid
         """
+
+        if role not in ROLES_LIST:
+            Console.error("Invalid role `{0}`".format(role))
+            return
+
         """adds members to a particular project"""
         user = SubUser.objects(username=user_name).first()
         project = Project.objects(project_id=project_id).first()
@@ -76,11 +109,11 @@ class Projects(object):
                     SubUser.objects(username=user_name).update_one(push__projects=project)
                     Console.info("User `{0}` added as Project member.".format(user_name))
                 elif role == "lead":
-                    Project.objects(project_id=project_id).update_one(set__lead=user)
+                    Project.objects(project_id=project_id).update_one(push__lead=user)
                     Console.info("User `{0}` set as Lead.".format(user_name))
                 else:
                     Console.error("Role `{0}` cannot be amended".format(role))
-            elif role == 'alumni':
+            elif role == "alumni":
                 Project.objects(project_id=project_id).update_one(push__alumnis=user_name)
                 Console.info("User `{0}` added as Alumni.".format(user_name))
             else:
@@ -89,11 +122,21 @@ class Projects(object):
             Console.error("The project `{0}` is not registered with Future Systems".format(project_id))
 
     @classmethod
-    def remove_user(cls, user_name, project_id):
+    def remove_user(cls, user_name, project_id, role):
+        if role not in ROLES_LIST:
+            Console.error("Invalid role `{0}`".format(role))
+            return
         user = SubUser.objects(username=user_name).first()
-        if user:
-            Project.objects(project_id=project_id).update_one(pull__members=user)
-            Console.info("User `{0}` removed as Project member.".format(user_name))
+        if user and role != "alumni":
+            if role == "member":
+                Project.objects(project_id=project_id).update_one(pull__members=user)
+                Console.info("User `{0}` removed as Project member.".format(user_name))
+            elif role == "lead":
+                Project.objects(project_id=project_id).update_one(pull__lead=user)
+                Console.info("User `{0}` removed as Project lead.".format(user_name))
+        elif role == "alumni":
+                Project.objects(project_id=project_id).update_one(pull__alumnis=user)
+                Console.info("User `{0}` removed as alumni.".format(user_name))
         else:
             Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
 
@@ -107,6 +150,9 @@ class Projects(object):
         :param project: the project id
         :type project: uuid
         '''
+        if role not in ROLES_LIST:
+            Console.error("Invalid role `{0}`".format(role))
+            return
         if role == "member":
             return project.members
         elif role == "lead":
@@ -177,43 +223,41 @@ class Projects(object):
             project.project_id = proposed_id
         project.save()
 
+
     @classmethod
     def create_project_from_file(cls, file_path):
-        implement()
+        # implement()
+        # return
+        try:
+            filename = path_expand(file_path)
+            file_config = ConfigDict(filename=filename)
+        except:
+            Console.error("Could not load file, please check filename and its path")
+            return
+
+        try:
+            project_config = file_config.get("cloudmesh", "project")
+            project = Project()
+            project_id=uuid.uuid4()
+            project_config.update({'project_id':project_id})
+            update_document(project, project_config)
+        except:
+            Console.error("Could not get project information from yaml file, "
+                          "please check you yaml file, users information must be "
+                          "under 'cloudmesh' -> 'project' -> project1..." + str(sys.exc_info()[0]))
+            return
+
+        try:
+            cls.add(project)
+            Console.info("Project created in the database.")
+        except:
+            Console.error("Project creation in database failed, " + str(sys.exc_info()))
         return
 
-        # try:
-        #     filename = path_expand(file_path)
-        #     file_config = ConfigDict(filename=filename)
-        # except:
-        #     Console.error("Could not load file, please check filename and its path")
-        #     return
-        #
-        # try:
-        #     project_config = file_config.get("cloudmesh", "project")
-        # except:
-        #     Console.error("Could not get project information from yaml file, "
-        #                   "please check you yaml file, users information must be "
-        #                   "under 'cloudmesh' -> 'project' -> project1...")
-        #     return
-        #
-        # project_id=uuid.uuid4()
-        # project_string = "Project("
-        # for key in project_config:
-        #     project_string = project_string + key + "=" + str(project_config[key]) + ","
-        # project_string += "project_id="+str(project_id)+","
-        # project_string += "status=pending"
-        # project_string += ")"
-        # print project_string
-        # try:
-        #     data = eval(project_string)
-        #     # print data
-        #     cls.add(data)
-        #     Console.info("Project created in the database.")
-        # except:
-        #     Console.error("Project creation in database failed, " + str(sys.exc_info()[0]))
-        #     return
-
+    @classmethod
+    def str_to_list(cls, string):
+        split_list = string.split(",")
+        return split_list
 
     @classmethod
     def list_projects(cls, display_fmt=None, project_id=None):
@@ -236,7 +280,7 @@ class Projects(object):
                     projects_dict = item
                 cls.display_two_column(projects_dict)
         except:
-            Console.error("Oops.. Something went wrong in the list projects method " + sys.exc_info()[0])
+            Console.error("Oops.. Something went wrong in the list projects method " + sys.exc_info())
         pass
 
 
@@ -252,10 +296,13 @@ class Projects(object):
                     # print key, " - ", value
                     # managers, lead, project_id, members,
                     if key == "lead":
-                        user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
-                        lead_name = user.firstname + " " + user.lastname
+                        entry = ""
+                        for item in value:
+                            user = User.objects.get(id=ObjectId(item.get('$oid')))
+                            entry += user.firstname + " " + user.lastname + ","
+                        entry = entry.strip(',')
                         items.append(key.replace('_', ' ').title())
-                        items.append(lead_name)
+                        items.append(entry)
                         rows.append(items)
                     elif key == "members":
                         entry = ""
@@ -304,6 +351,15 @@ class Projects(object):
             print table.draw()
         pass
 
+    # @classmethod
+    # def reorder(cls, rows_list=None):
+    #     row_order = [16, 7, 2, 37, 35, 22, 30, 10, 24, 4, 35, 32, 1, 30, 21, 23, 15, 3, 29, 28, 20, 33, 13, 8, 18, 17,
+    #                  26, 5, 6, 19, 25, 12, 30, 37, 27, 34, 9, 39, 14, 29, 11]
+    #     if rows_list:
+    #         rows_list = [rows_list[i] for i in row_order]
+    #     return rows_list
+    #     pass
+
     @classmethod
     def display(cls, project_dicts=None, project_id=None):
         if bool(project_dicts):
@@ -313,31 +369,49 @@ class Projects(object):
                 headers = []
                 for key, value in entry.iteritems():
                     if key == "lead":
-                        user = SubUser.objects.get(id=ObjectId(value.get('$oid')))
-                        lead_name = user.firstname + " " + user.lastname
-                        items.append(lead_name)
+                        entry = ""
+                        if value:
+                            for item in value:
+                                user = User.objects.get(id=ObjectId(item.get('$oid')))
+                                entry += user.firstname + " " + user.lastname + ","
+                            entry = entry.strip(',')
+                            items.append(entry)
+                        else:
+                            items.append("No leads")
                     elif key == "members":
                         entry = ""
-                        for item in value:
-                            user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname + " " + user.lastname + ","
-                        entry = entry.strip(',')
-                        items.append(entry)
+                        if value:
+                            for item in value:
+                                user = User.objects.get(id=ObjectId(item.get('$oid')))
+                                entry += user.firstname + " " + user.lastname + ","
+                            entry = entry.strip(',')
+                            items.append(entry)
+                        else:
+                            items.append("No members")
                     elif key == "managers":
                         entry = ""
-                        for item in value:
-                            user = User.objects.get(id=ObjectId(item.get('$oid')))
-                            entry += user.firstname + " " + user.lastname + ","
-                        entry = entry.strip(',')
-                        items.append(entry)
+                        if value:
+                            for item in value:
+                                user = User.objects.get(id=ObjectId(item.get('$oid')))
+                                entry += user.firstname + " " + user.lastname + ","
+                            entry = entry.strip(',')
+                            items.append(entry)
+                        else:
+                            items.append("No managers")
                     elif key == "project_id":
                         items.append(value.get('$uuid').encode('ascii', 'ignore'))
                     else:
                         items.append(value)
                     headers.append(key.replace('_', ' ').title())
                 values.append(items)
+
+            # Re-order the columns as per our requirement
+            # header order 5, 0, 3, 2, 1, 4 => project_id, status, title, lead, managers, members
+            header_order = [5, 0, 3, 2, 1, 4]
+            headers = [headers[i] for i in header_order]
+            new_values = [[x[5], x[0], x[3], x[2], x[1], x[4]] for x in values]
             table_fmt = "fancy_grid"
-            table = tabulate(values, headers, table_fmt)
+            table = tabulate(new_values, headers, table_fmt)
             separator = ''
             try:
                 seperator = table.split("\n")[1].replace("|", "+")

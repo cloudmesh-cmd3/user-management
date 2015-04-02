@@ -47,8 +47,8 @@ class cm_account_admin:
             management project activate [PROJECTID]
             management project deactivate [PROJECTID]
             management project close [PROJECTID]
-            management project add member [USERNAME] [PROJECTID] [ROLE]
-            management project remove member [USERNAME] [PROJECTID]
+            management project add [USERNAME] [PROJECTID] [ROLE]
+            management project remove [USERNAME] [PROJECTID] [ROLE]
 
         Options:
             --help          Show this screen
@@ -151,7 +151,7 @@ class cm_account_admin:
                 if arguments['PROJECTID']:
                     project_id = arguments['PROJECTID']
                 project.list_projects(display_fmt, project_id)
-            elif arguments['project'] and arguments['add']:
+            elif arguments['project'] and arguments['add'] and arguments['YAMLFILE']:
                 project = Projects()
                 project.create_project_from_file(arguments['YAMLFILE'])
             elif arguments['project'] and arguments['delete']:
@@ -188,12 +188,12 @@ class cm_account_admin:
                     Console.info("Project "+arguments['PROJECTID']+" closed.")
                 else:
                     Console.error("Please specify a project to be amended")
-            elif arguments['project'] and arguments['add'] and arguments['member']:
+            elif arguments['project'] and arguments['add'] and arguments['USERNAME']:
                 project = Projects()
                 project.add_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
-            elif arguments['project'] and arguments['remove'] and arguments['member']:
+            elif arguments['project'] and arguments['remove'] and arguments['USERNAME']:
                 project = Projects()
-                project.remove_user(arguments['USERNAME'], arguments['PROJECTID'])
+                project.remove_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)

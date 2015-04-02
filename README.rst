@@ -148,8 +148,8 @@ To add a member to a project::
 
     THe user roles are member, lead, alumni. When adding a user as a member or lead, the USERID should be available
     within the database. If not an error message would be displayed. An alumni need not be a valid user within the
-    system. No no check will be done against the alumni role. When you add a user as a lead, the existing lead will
-    be replaced with new lead, whereas user being added as a member will be appended to the existing member list.
+    system. No no check will be done against the alumni role. When you add a user as a lead or a member, user will be
+    appended to the existing list accordingly.
 
 To remove a member from a project::
 

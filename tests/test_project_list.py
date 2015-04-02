@@ -30,7 +30,7 @@ class TestGenerate:
 
         project = Projects()
         display_fmt='json'
-        project_id = '7c188052cf034021a938fdbc3c608a2e'
+        project_id = 'dbe4baed060242549c92fda3d047fb92'
         project.list_projects(project_id=project_id)
 
 

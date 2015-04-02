@@ -387,9 +387,10 @@ class Users(object):
             user_string = "SubUser("
             for key in user_config:
                 # print key, " - ", user_config[key]
-                user_string = user_string + key + "=" + "\"" + user_config[key] + "\","
+                user_string = user_string + key + "=\"" + user_config[key] + "\","
             user_string += "status=\"pending\","
             user_string += ")"
+            print user_string
             data = eval(user_string)
         except:
             Console.error("User object creation failed.")

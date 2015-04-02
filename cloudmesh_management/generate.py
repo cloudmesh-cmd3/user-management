@@ -81,7 +81,7 @@ def random_project():
         title=fake.sentence()[:30],
         categories=['FutureSystems'],
         keywords=['sqllite'],
-        lead=user,
+        lead=[user],
         managers=[user],
         members=[user],
         alumnis=[fake.name()],

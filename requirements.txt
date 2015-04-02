@@ -14,3 +14,4 @@ tabulate
 cmd3
 fake-factory
 passlib
+texttable
