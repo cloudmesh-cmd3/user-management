@@ -4,10 +4,10 @@ from cloudmesh_management.user import Users
 import csv
 from faker import Factory
 
-class TestGenerate:
 
+class TestGenerate:
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname="gergor"
+    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -16,7 +16,7 @@ class TestGenerate:
             meta = {'db_alias': db_name}
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
-    
+
     def teardown(self):
         # HEADING()
         pass
@@ -26,7 +26,7 @@ class TestGenerate:
         HEADING()
         fake = Factory.create()
 
-        spam_writer = csv.writer(open('users.csv','wb'), delimiter=',')
+        spam_writer = csv.writer(open('users.csv', 'wb'), delimiter=',')
         x = 1
         while x in range(5):
             print x
@@ -53,8 +53,8 @@ class TestGenerate:
             advisor = fake.name()
             projects = []
             spam_writer.writerow([firstname, status, title, lastname, email, username, active, password,
-                                     confirm, phone, department, institution, institutionrole, address, country,
-                                     citizenship, bio, url, advisor, projects])
+                                  confirm, phone, department, institution, institutionrole, address, country,
+                                  citizenship, bio, url, advisor, projects])
             x += 1
 
 

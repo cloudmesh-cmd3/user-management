@@ -9,15 +9,14 @@ from cloudmesh_management.generate import generate_projects
 
 
 class TestGenerate:
-
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname="gergor"
+    firstname = "gergor"
 
     def setup(self):
         # HEADING()
         self.db = "hallo"
         pass
-    
+
     def teardown(self):
         # HEADING()
         pass

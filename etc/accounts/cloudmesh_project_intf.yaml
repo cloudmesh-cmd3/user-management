@@ -45,6 +45,10 @@ cloudmesh:
                     label: Contact
                     type: text
                     required: True
+                - gregor:
+                    label: Gregor
+                    type: text
+                    required: True
         details:
             label: Project Details
             fields:

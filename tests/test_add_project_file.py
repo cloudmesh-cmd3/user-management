@@ -2,7 +2,6 @@ from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collec
 from cloudmesh_base.util import HEADING
 from cloudmesh_management.project import Projects
 
-
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_base.locations import config_file
 from cloudmesh_base.ConfigDict import ConfigDict
@@ -15,10 +14,10 @@ import json
 import sys
 from texttable import Texttable
 
-class TestGenerate:
 
+class TestGenerate:
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname="gergor"
+    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -27,7 +26,7 @@ class TestGenerate:
             meta = {'db_alias': db_name}
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
-    
+
     def teardown(self):
         # HEADING()
         pass
