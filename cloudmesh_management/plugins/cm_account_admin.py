@@ -13,9 +13,6 @@ def get_version():
 
 class cm_account_admin:
 
-    def __init__(self):
-        pass
-
     def activate_cm_account_admin(self):
         self.register_command_topic('admin', 'management')
 
