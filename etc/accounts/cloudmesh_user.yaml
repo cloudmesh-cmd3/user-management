@@ -6,6 +6,10 @@ cloudmesh:
         profile:
             label: Profile
             fields:
+                - xyz:
+                    label: xyz
+                    type: text
+                    required: True
                 - username:
                     label: Username
                     type: text

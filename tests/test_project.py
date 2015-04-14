@@ -12,7 +12,6 @@ connect('user', port=27777)
 
 
 class UserProject():
-
     def __init__(self):
         pass
 
@@ -21,15 +20,15 @@ class UserProject():
 
     title = ""
     category = ""
-    #keywords = ""
+    # keywords = ""
     contact = ""
-    #members = ""
-    #alumni = ""
-    #nsf_grant_number = ""
-    #nsf_grant_url = ""
+    # members = ""
+    # alumni = ""
+    # nsf_grant_number = ""
+    # nsf_grant_url = ""
     results = ""
-    nsf_Agreement = ""		#Yes/No
-    slide_collection_agreement = ""	#Yes/No
+    nsf_Agreement = ""  #Yes/No
+    slide_collection_agreement = ""  #Yes/No
     other = ""
 
     def add_project(self):
@@ -43,12 +42,12 @@ class UserProject():
         self.nsf_Agreement = raw_input("NSF Agreement (Yes or No): ")
         self.slide_collection_agreement = raw_input("Slide Collection Agreement (Yes or No): ")
         self.other = raw_input("Other: ")
-        project = Project(project_title = self.title,
-                          lead = user_account, manager = user_account,
-                          contact = self.contact, results = self.results,
-                          nsf_Aggreement = self.nsf_Agreement,
-                          slide_collection_aggreement = self.slide_collection_agreement,
-                          other = self.other )
+        project = Project(project_title=self.title,
+                          lead=user_account, manager=user_account,
+                          contact=self.contact, results=self.results,
+                          nsf_Aggreement=self.nsf_Agreement,
+                          slide_collection_aggreement=self.slide_collection_agreement,
+                          other=self.other)
         project.save()
         print project.project_title
 
@@ -74,8 +73,9 @@ class UserProject():
             if project.lead.username == user_name:
                 project.delete()
 
+
 c = UserProject()
 
 c.add_project()
 c.list_project()
-#c.del_project()
+# c.del_project()

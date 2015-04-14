@@ -4,9 +4,8 @@ from cloudmesh_management.user import Users
 
 
 class TestGenerate:
-
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname="gergor"
+    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -15,7 +14,7 @@ class TestGenerate:
             meta = {'db_alias': db_name}
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
-    
+
     def teardown(self):
         # HEADING()
         pass
@@ -25,7 +24,7 @@ class TestGenerate:
         HEADING()
 
         user = Users()
-        display_fmt='json'
+        display_fmt = 'json'
         user_name = 'gregg'
         user.list_users(disp_fmt='json', username=user_name)
 

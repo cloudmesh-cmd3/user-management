@@ -3,25 +3,12 @@
 version = "1.1"
 
 
-requirements = [
-    'future',
-    'sh',
-    'docopt',
-    'pyaml',
-    'simplejson',
-    'nose',
-    'python-hostlist',
-    'prettytable',
-    'pytimeparse',
-    'cloudmesh_base',
-    'mongoengine',
-    'cloudmesh_database',
-    'tabulate',
-    'cmd3',
-    'fake-factory',
-    'passlib',
-    'texttable'
-]
+def parse_requirements(filename):
+    """ load requirements from a pip requirements file """
+    lineiter = (line.strip() for line in open(filename))
+    return [line for line in lineiter if line and not line.startswith("#")]
+
+requirements = parse_requirements('requirements.txt')
 
 import os
 

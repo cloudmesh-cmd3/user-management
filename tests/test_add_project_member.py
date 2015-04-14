@@ -8,9 +8,8 @@ from cloudmesh_management.user import SubUser
 
 
 class TestGenerate:
-
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname="gergor"
+    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -19,7 +18,7 @@ class TestGenerate:
             meta = {'db_alias': db_name}
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
-    
+
     def teardown(self):
         # HEADING()
         pass
