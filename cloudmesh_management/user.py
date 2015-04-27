@@ -1,15 +1,17 @@
+import json
+import sys
+
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_base.locations import config_file
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
-from cloudmesh_management.base_classes import SubUser, Project
 from passlib.hash import sha256_crypt
 from bson.objectid import ObjectId
 import yaml
-import json
-import sys
 from texttable import Texttable
+
+from cloudmesh_management.base_classes import SubUser, Project
+
 
 STATUS = ('pending', 'approved', 'blocked', 'denied', 'active', 'suspended')
 
@@ -30,7 +32,7 @@ def read_user(filename):
     """
     Reads user data from a yaml file
 
-    :param filename: The file anme
+    :param filename: The file name
     :type filename: String of the path
     """
     stream = open(filename, 'r')
@@ -59,14 +61,15 @@ def read_user(filename):
     return user
 
 
+# noinspection PyBroadException
 class Users(object):
     """
     Convenience object to manage several users
     """
 
     def __init__(self):
-        config = ConfigDict(filename=config_file("/cloudmesh_server.yaml"))
-        port = config['cloudmesh']['server']['mongo']['port']
+        # config = ConfigDict(filename=config_file("/cloudmesh_server.yaml"))
+        # port = config['cloudmesh']['server']['mongo']['port']
 
         # db = connect('manage', port=port)
         self.users = SubUser.objects()
@@ -177,7 +180,6 @@ class Users(object):
                 Console.error("Oops! Something went wrong while trying to amend user status")
         else:
             Console.error("Please specify the user to be amended")
-
 
     @classmethod
     def get_user_status(cls, user_name):
@@ -293,7 +295,6 @@ class Users(object):
                     Console.error("No user details available in the database.")
         except:
             Console.error("Please provide a username.")
-
 
     @classmethod
     def display(cls, user_dicts=None, user_name=None):

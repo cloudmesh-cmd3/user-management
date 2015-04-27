@@ -1,10 +1,11 @@
-from fabric.api import local, hide, settings
-from cloudmesh_base.locations import config_file
-from cloudmesh_base.ConfigDict import ConfigDict
-from cloudmesh_base.util import path_expand, banner, yn_choice
 import os
 import sys
 import subprocess
+
+from fabric.api import local, hide, settings
+from cloudmesh_base.locations import config_file
+from cloudmesh_base.ConfigDict import ConfigDict
+from cloudmesh_base.util import path_expand, banner
 
 
 def get_status(app):
@@ -56,12 +57,7 @@ def start(auth=False):
         print "NO ACTION: mongo already running in pid {0} for port {1}"\
             .format(pid, port)
     else:
-        print "ACTION: Starting mongod"
-        print
-        print "NOTE: the preparation of mongo may take a few minutes"
-        print "      please do not interrupt this program."
-        print
-        print "      Please be patient!"
+        print "ACTION: Starting mongod ... Please wait ..."
         print
 
         with_auth = ""

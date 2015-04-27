@@ -38,7 +38,6 @@ class User(CloudmeshObject):
     advisor = StringField(required=True)
     country = StringField(required=True)
 
-
     """
     Hidden fields
     """
@@ -99,13 +98,12 @@ class User(CloudmeshObject):
             "message",
         ]
 
-
     def is_active(self):
         """
         Check if the user is active
         """
-        d1 = datetime.datetime.now()
-        return (self.active == True) and (datetime.datetime.now() < self.date_deactivate)
+        # d1 = datetime.datetime.now()
+        return self.active and (datetime.datetime.now() < self.date_deactivate)
 
     @classmethod
     def set_password(cls, password):
@@ -115,7 +113,7 @@ class User(CloudmeshObject):
         :param password:
         :type password:
         """
-        #self.password_hash = generate_password_hash(password)
+        # self.password_hash = generate_password_hash(password)
         pass
 
     @classmethod
@@ -135,7 +133,8 @@ class User(CloudmeshObject):
         Returns a json representation of the object
         """
         d = {}
-        for (field, value) in cls.order():
+        order_iterator = iter(cls.order())
+        for (field, value) in order_iterator:
             try:
                 d[field] = value
             except:
@@ -147,21 +146,9 @@ class User(CloudmeshObject):
         """
         Returns the yaml object of the object.
         """
-        return cls.__str__(fields=True, all=True)
+        # return cls.__str__(fields=True, all=True)
+        return cls.__str__(User())
 
-    """
-    def __str__(self, fields=False, all=False):
-        content = ""
-        for (field, value)  in self.order():
-            try:
-                if not (value is None or value == "") or all:
-                    if fields:
-                        content = content + field + ": "
-                    content = content + value + "\n"
-            except:
-                pass
-        return content
-    """
 
 ###########
 
@@ -169,7 +156,7 @@ STATUS = ('pending', 'approved', 'completed', 'denied')
 
 CATEGORY = ('Database', 'FutureSystems', 'other')
 
-DISCIPLINE = ('other')
+DISCIPLINE = 'other'
 # see https://ncsesdata.nsf.gov/nsf/srs/webcasp/data/gradstud.htm
 # put in discipline.txt and initialize from there through reading the file and codes
 #
@@ -245,15 +232,15 @@ class Project(CloudmeshObject):
         managers
         members
         alumnis
-        grant_orgnization
+        grant_organization
         grant_id
         grant_url
         results
-        aggreement_use
-        aggreement_slides
-        aggreement_support
-        aggreement_sotfware
-        aggreement_documentation
+        agreement_use
+        agreement_slides
+        agreement_support
+        agreement_software
+        agreement_documentation
         comments
         join_open
         join_notification
@@ -361,7 +348,6 @@ class Project(CloudmeshObject):
     project_id = UUIDField()
 
     status = StringField(choices=STATUS, required=REQUIRED)
-
 
     def to_json(self):
         """

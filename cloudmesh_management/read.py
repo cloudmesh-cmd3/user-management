@@ -1,11 +1,8 @@
-import yaml
-from mongoengine import *
-import datetime, time
-import hashlib, uuid
-import yaml
 from pprint import pprint
+
+from mongoengine import *
+
 from user import SubUser, Users
-from cloudmesh_management.generate import random_user
 from cloudmesh_management.user import read_user
 
 
@@ -16,7 +13,6 @@ connect('user', port=27777)
 users = Users()
 
 # Reads user information from file
-
 
 
 def main():

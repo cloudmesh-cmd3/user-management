@@ -1,3 +1,5 @@
+bson
+faker
 future
 sh
 docopt

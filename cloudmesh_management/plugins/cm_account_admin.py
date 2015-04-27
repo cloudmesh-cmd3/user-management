@@ -1,10 +1,12 @@
 from __future__ import print_function
-from cloudmesh_management.generate import generate_users, generate_projects
-from cloudmesh_management.user import Users
-from cloudmesh_management.project import Projects
+
 from cmd3.console import Console
 from cmd3.shell import command
 
+from cloudmesh_management.generate import generate_users, generate_projects
+from cloudmesh_management.user import Users
+from cloudmesh_management.project import Projects
+from cloudmesh_management.dbutil import DBUtil
 
 def get_version():
     import cloudmesh_management
@@ -46,6 +48,8 @@ class cm_account_admin:
             management project close [PROJECTID]
             management project add [USERNAME] [PROJECTID] [ROLE]
             management project remove [USERNAME] [PROJECTID] [ROLE]
+            management export [DATABASE] [COLLECTION]
+            management import [FILENAME] [--db=DBNAME] [--collection=NAME]
 
         Options:
             --help          Show this screen
@@ -191,6 +195,40 @@ class cm_account_admin:
             elif arguments['project'] and arguments['remove'] and arguments['USERNAME']:
                 project = Projects()
                 project.remove_user(arguments['USERNAME'], arguments['PROJECTID'], arguments['ROLE'])
+            #
+            # Database export/import part
+            #
+            elif arguments['export']:
+                database = None
+                coll_name = None
+                if arguments['DATABASE']:
+                    database = arguments['DATABASE']
+                else:
+                    Console.info("Please specify the database..")
+                if arguments['COLLECTION']:
+                    coll_name = arguments['COLLECTION']
+                else:
+                    coll_name = "*"
+                #
+                DBUtil().serialize(db=database, collection=coll_name)
+            elif arguments['import']:
+                database = None
+                coll_name = None
+                filename = None
+                if arguments['FILENAME']:
+                    filename = arguments['FILENAME']
+                if arguments['--db']:
+                    database = arguments['--db']
+                else:
+                    Console.info("Please specify the target database..")
+
+                if arguments['--collection']:
+                    coll_name = arguments['--collection']
+                else:
+                    Console.info("Please specify the target collection..")
+                #
+                DBUtil().de_serialize(file=filename, db=database, collection=coll_name)
+
         except Exception, e:
             Console.error("Invalid arguments")
             print(e)

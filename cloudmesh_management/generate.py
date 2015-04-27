@@ -151,9 +151,9 @@ def main():
     print 70 * "&"
     print users.find()[0]
 
-    projects = Project.objects()
-    print projects.count()
-    pprint(projects[0])
+    _projects = Project.objects()
+    print _projects.count()
+    pprint(_projects[0])
 
 
 if __name__ == "__main__":

@@ -14,16 +14,17 @@ from mongoengine import fields
 
 ROLES_LIST = ["lead", "member", "alumni"]
 
+
 def implement():
     print "TO BE IMPLEMENTED"
     return
 
 
 def update_document(document, data_dict):
-    def field_value(field, value):
+    def field_value(field, values):
         if field.__class__ in (fields.ListField, fields.SortedListField):
-            if value:
-                return str(value).split(", ")
+            if values:
+                return str(values).split(", ")
             else:
                 return []
 
@@ -36,7 +37,7 @@ def update_document(document, data_dict):
             pass
             # return field.document_type(**value)
         else:
-            return value
+            return values
 
     [setattr(
         document, key,
@@ -91,8 +92,7 @@ class Projects(object):
         :type role: String
         :param user_name: the username
         :type user_name: String
-        :param project: the project id
-        :type project: uuid
+        :param project_id: the project id
         """
 
         if role not in ROLES_LIST:
@@ -135,8 +135,8 @@ class Projects(object):
                 Project.objects(project_id=project_id).update_one(pull__lead=user)
                 Console.info("User `{0}` removed as Project lead.".format(user_name))
         elif role == "alumni":
-                Project.objects(project_id=project_id).update_one(pull__alumnis=user)
-                Console.info("User `{0}` removed as alumni.".format(user_name))
+            Project.objects(project_id=project_id).update_one(pull__alumnis=user)
+            Console.info("User `{0}` removed as alumni.".format(user_name))
         else:
             Console.error("The user `{0}` has not registered with Future Systems".format(user_name))
 
@@ -238,8 +238,8 @@ class Projects(object):
         try:
             project_config = file_config.get("cloudmesh", "project")
             project = Project()
-            project_id=uuid.uuid4()
-            project_config.update({'project_id':project_id})
+            project_id = uuid.uuid4()
+            project_config.update({'project_id': project_id})
             update_document(project, project_config)
         except:
             Console.error("Could not get project information from yaml file, "
@@ -353,7 +353,7 @@ class Projects(object):
 
     # @classmethod
     # def reorder(cls, rows_list=None):
-    #     row_order = [16, 7, 2, 37, 35, 22, 30, 10, 24, 4, 35, 32, 1, 30, 21, 23, 15, 3, 29, 28, 20, 33, 13, 8, 18, 17,
+    # row_order = [16, 7, 2, 37, 35, 22, 30, 10, 24, 4, 35, 32, 1, 30, 21, 23, 15, 3, 29, 28, 20, 33, 13, 8, 18, 17,
     #                  26, 5, 6, 19, 25, 12, 30, 37, 27, 34, 9, 39, 14, 29, 11]
     #     if rows_list:
     #         rows_list = [rows_list[i] for i in row_order]
