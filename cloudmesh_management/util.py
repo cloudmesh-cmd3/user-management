@@ -25,7 +25,6 @@ def build_db_field(item):
     """
 
     for keys, values in item.items():
-        entry_dict = {}
         field_entry = keys
         field_type = ""
         required = ""
@@ -189,7 +188,7 @@ def disciplines_list():
     disciplines = []
     for key, value in data.items():
         item = ''
-        item = item + str(value['name'])
+        item += str(value['name'])
         disciplines.append(item)
     disciplines.sort()
     disciplines.insert(0, 'Other(OTH)')
