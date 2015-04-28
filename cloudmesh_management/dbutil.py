@@ -123,10 +123,28 @@ class DBUtil:
                     else:
                         Console.error("Error in getting connection to the collection..")
                 else:
-                    implement()
-                    # for item in self._db_conn.collection_names(include_system_collections=False):
-                    #     print item
-
+                    # implement()
+                    for item in self._db_conn.collection_names(include_system_collections=False):
+                        self._coll_conn = self._db_conn[item]
+                        #
+                        dir_name = "dump"
+                        if not os.path.exists(dir_name):
+                            os.makedirs(dir_name)
+                        sub_dir = dir_name+"/"+self._database
+                        if not os.path.exists(sub_dir):
+                            os.makedirs(sub_dir)
+                        json_file = sub_dir+"/"+item+".json"
+                        if self._db_conn:
+                            docs = self._coll_conn.find()
+                            if self._coll_conn.find().count() > 0:
+                                with open(json_file, "w") as outfile:
+                                    dump = dumps([doc for doc in docs])
+                                    outfile.write(dump)
+                                Console.info(" Collection - {0} - written to file - {1}".format(item, json_file))
+                            else:
+                                Console.info("Looks like the collection \"{0}\" is empty.".format(item))
+                        else:
+                            Console.error("Error in getting connection to the collection..")
             if self._conn:
                 try:
                     self._conn.close()
@@ -141,10 +159,11 @@ class DBUtil:
         The method is used to import the data in the provided json file into a collection within the database
 
         :param kwargs:
-                    Can contain a collection name, database name, file name, credentials for authentication to
-                    the database.
+                    Can contain a collection name, database name, file name, directory name containing the json files,
+                     credentials for authentication to the database.
 
-                    If a collection name is not specified, uses the name of the file as the collection name.
+                    If a collection name is not specified, uses the name of the file as the collection name or name of
+                    the files in the specified directory as the collection name.
         :return:
                 None
         """
@@ -152,6 +171,7 @@ class DBUtil:
         filename = None
         username = None
         password = None
+        dir_name = None
 
         for key, value in kwargs.iteritems():
             if key == "collection":
@@ -160,12 +180,18 @@ class DBUtil:
                 self._database = value
             elif key == "file":
                 filename = value
+            elif key == "dir":
+                dir_name = value
             elif key == "user_name":
                 username = value
             elif key == "pwd":
                 password = value
         #
         if self._database:
+            if filename is None and dir_name is None:
+                Console.error("Please specify a filename or a directory name that contains the data to be imported.")
+                return
+
             if filename:
                 if not self._collection:
                     sep1_idx = filename.rfind('/')
@@ -203,8 +229,51 @@ class DBUtil:
                         self._conn.close()
                     except:
                         Console.error("Error in closing connection..")
-            else:
-                Console.error("Please specify the filename to be imported.")
+
+            if dir_name:
+                if os.path.isdir(dir_name):
+                    if os.listdir(dir_name):
+                        for file_item in os.listdir(dir_name):
+                            if file_item.endswith(".json"):
+                                if file_item.rfind('.') != -1:
+                                    self._collection = file_item[0:file_item.rfind('.')]
+                                else:
+                                    self._collection = filename[0:]
+
+                            Console.info(self._collection)
+
+                            self._db_conn = DBConnFactory.getconn(self._database)
+                            if self._collection not in self._db_conn.collection_names():
+                                self._db_conn.create_collection(self._collection)
+                            #
+                            self._conn = self.connect(user_name=username, pwd=password)
+                            if self._conn:
+                                f = None
+                                try:
+                                    f = open(dir_name+"/"+file_item, "rb")
+                                    bson_data = f.read()
+                                    json_data = re.sub(r'ObjectId\s*\(\s*\"(\S+)\"\s*\)', r'{"$oid": "\1"}', bson_data)
+                                    json_data = re.sub(r'Date\s*\(\s*(\S+)\s*\)', r'{"$date": \1}', json_data)
+                                    data = json.loads(json_data, object_hook=json_util.object_hook)
+                                    _db = self._conn[self._database]
+                                    c = _db[self._collection]
+                                    for x in data:
+                                        c.insert(x)
+                                    count = c.count()
+                                    Console.info("{0} records imported into {1}.".format(count, self._collection))
+                                except IOError:
+                                    Console.error("Error in opening file: {0}".format(filename))
+
+                            if self._conn:
+                                try:
+                                    self._conn.close()
+                                except:
+                                    Console.error("Error in closing connection..")
+                    else:
+                        Console.error("Source Directory - {0} - is empty.".format(dir_name))
+                    return
+                else:
+                    Console.error("Invalid Source Directory - {0}.".format(dir_name))
         else:
             Console.error("Please specify a target database.")
         pass

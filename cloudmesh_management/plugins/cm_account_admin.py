@@ -48,8 +48,8 @@ class cm_account_admin:
             management project close [PROJECTID]
             management project add [USERNAME] [PROJECTID] [ROLE]
             management project remove [USERNAME] [PROJECTID] [ROLE]
-            management export [DATABASE] [COLLECTION]
-            management import [FILENAME] [--db=DBNAME] [--collection=NAME]
+            management export [DATABASE] [COLLECTION] [--user=USERNAME] [--password=PASSWORD]
+            management import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
 
         Options:
             --help          Show this screen
@@ -201,33 +201,60 @@ class cm_account_admin:
             elif arguments['export']:
                 database = None
                 coll_name = None
+                username = None
+                password = None
                 if arguments['DATABASE']:
                     database = arguments['DATABASE']
                 else:
                     Console.info("Please specify the database..")
+                #
                 if arguments['COLLECTION']:
                     coll_name = arguments['COLLECTION']
                 else:
                     coll_name = "*"
                 #
-                DBUtil().serialize(db=database, collection=coll_name)
+                if arguments['--user']:
+                    username = arguments['--user']
+
+                if arguments['--password']:
+                    password = arguments['--password']
+                #
+                DBUtil().serialize(db=database,
+                                   collection=coll_name,
+                                   user_name=username,
+                                   pwd=password)
             elif arguments['import']:
                 database = None
                 coll_name = None
                 filename = None
-                if arguments['FILENAME']:
-                    filename = arguments['FILENAME']
+                username = None
+                password = None
+                dir_name = None
+
+                if arguments['--file']:
+                    filename = arguments['--file']
+
+                if arguments['--dir']:
+                    dir_name = arguments['--dir']
+
                 if arguments['--db']:
                     database = arguments['--db']
-                else:
-                    Console.info("Please specify the target database..")
 
                 if arguments['--collection']:
                     coll_name = arguments['--collection']
-                else:
-                    Console.info("Please specify the target collection..")
+
+                if arguments['--user']:
+                    username = arguments['--user']
+
+                if arguments['--password']:
+                    password = arguments['--password']
                 #
-                DBUtil().de_serialize(file=filename, db=database, collection=coll_name)
+                DBUtil().de_serialize(file=filename,
+                                      dir=dir_name,
+                                      db=database,
+                                      collection=coll_name,
+                                      user_name=username,
+                                      pwd=password)
 
         except Exception, e:
             Console.error("Invalid arguments")

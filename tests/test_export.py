@@ -11,12 +11,11 @@ class ExportTest:
         # HEADING()
         pass
 
-    def test_generate(self):
+    def test_export(self):
         HEADING()
-        print "Running dbutil Test"
-        database = "cloudmesh"
-        dbutil = DBUtil()
-        dbutil._connect(db=database)
+        obj = DBUtil()
+        obj.serialize(db="cloudmesh", collection="cloudmesh")
+
 
 
 
