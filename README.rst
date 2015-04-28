@@ -181,11 +181,11 @@ To export collection(s) from a database::
 
 .. note::
 
-    To pass the username and password to access the database as parameters use --user=<USERNAME> and
+    - To pass the username and password to access the database as parameters use --user=<USERNAME> and
     --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
     file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
-    If <COLLECTION NAME> is not specified, the system tries to export all the non system collections to a json file
+    - If <COLLECTION NAME> is not specified, the system tries to export all the non system collections to a json file
     names after the collection.
 
 
@@ -199,18 +199,11 @@ To import data from json file into a database::
 
 .. note::
 
-    To pass the username and password to access the database as parameters use --user=<USERNAME> and
+    - To pass the username and password to access the database as parameters use --user=<USERNAME> and
     --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
     file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
-    A file name or a directory name needs to be passed as source of the data.
-
-.. note:: This is a note admonition.
-   This is the second line of the first paragraph.
-
-   - The note contains all indented body elements
-     following.
-   - It includes this bullet list.
+    - A file name or a directory name needs to be passed as source of the data.
 
 
 Things partially completed
