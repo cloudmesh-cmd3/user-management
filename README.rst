@@ -205,6 +205,13 @@ To import data from json file into a database::
 
     A file name or a directory name needs to be passed as source of the data.
 
+.. note:: This is a note admonition.
+   This is the second line of the first paragraph.
+
+   - The note contains all indented body elements
+     following.
+   - It includes this bullet list.
+
 
 Things partially completed
 ==========================
