@@ -125,9 +125,9 @@ To amend a status of the user::
 The state changes for a user is listed in the figure below:
 
 ..  figure:: docs/management_states.png
-    :scale: 50%
+:scale: 50%
     :align: center
-    :alt: User states
+        :alt: User states
 
 Manage Projects
 ===============
@@ -181,8 +181,7 @@ To export collection(s) from a database::
 
 .. note::
 
-    - To pass the username and password to access the database as parameters use --user=<USERNAME> and
-    --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
+    - To pass the username and password to access the database as parameters use --user=<USERNAME> and --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
     file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
     - If <COLLECTION NAME> is not specified, the system tries to export all the non system collections to a json file
@@ -199,8 +198,7 @@ To import data from json file into a database::
 
 .. note::
 
-    - To pass the username and password to access the database as parameters use --user=<USERNAME> and
-    --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
+    - To pass the username and password to access the database as parameters use --user=<USERNAME> and --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the
     file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
     - A file name or a directory name needs to be passed as source of the data.
