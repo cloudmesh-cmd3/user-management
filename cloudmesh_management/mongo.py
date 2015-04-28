@@ -7,6 +7,10 @@ from cloudmesh_base.locations import config_file
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.util import path_expand, banner
 
+#####################################################
+#   The code has been taken from mongo.py under
+#   "cloudmesh/fabfile"
+#####################################################
 
 def get_status(app):
     with hide('output', 'running', 'warnings'):
@@ -32,10 +36,9 @@ def is_yes(value):
 
 
 def start(auth=False):
-    '''
-    start the mongod service in the location as specified in
-    cloudmesh_server.yaml
-    '''
+    """
+    Start the mongod service in the location as specified in "cloudmesh_server.yaml"
+    """
     banner("Starting mongod")
     config = ConfigDict(filename=config_file("/cloudmesh_server.yaml"))
     mongo_config = config['cloudmesh']['server']['mongo']
@@ -75,7 +78,7 @@ def start(auth=False):
 
 def stop():
     """
-    stops the currently running mongod
+    Stops the currently running mongod
     """
     # for some reason shutdown does not work
     # local("mongod --shutdown")
