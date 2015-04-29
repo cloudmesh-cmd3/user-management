@@ -143,9 +143,6 @@ Note
 The state changes for a user is listed in the figure below:
 
 ..  figure:: docs/management_states.png
-:scale: 50%
-    :align: center
-        :alt: User states
 
 Manage Projects
 ===============
