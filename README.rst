@@ -38,14 +38,20 @@ If you are starting from scratch, the commands that needs to be run are listed b
     python setup.py requirements
     python setup.py install
 
-.. IMPORTANT::
+^^^^^^^^^
+Important
+^^^^^^^^^
 
     The fields of the User and Project objects can be generated dynamically from the YAML file in the directory
-    "etc/accounts". To add/remove fields, amend the YAML file as required. After making the amendments, follow the steps
-    below:
+    "etc/accounts". A default file for **user** is available under etc/accounts/cloudmesh_user.yaml and a default file for
+    **project** is available under etc/accounts/cloudmesh_project.yaml. To add/remove fields, amend the YAML file as required.
+
+If you make any amendments, follow the steps below::
 
     cp etc/accounts/cloudmesh_user.yaml ~/.cloudmesh/cloudmesh_user.yaml
     cp etc/accounts/cloudmesh_project.yaml ~/.cloudmesh/cloudmesh_project.yaml
+    python setup.py install
+
 
 If everything is setup correctly, run the following command::
 
@@ -85,7 +91,6 @@ You should see the screen below::
             management import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
 
         Options:
-            --help          Show this screen
             --format=json   Show the user details in json format
 
 
@@ -211,14 +216,13 @@ To import data from json file into a database::
     - A file name or a directory name needs to be passed as source of the data.
 
 
-Things partially completed
-==========================
+Yet to be done
+==============
 
-Create Mongo Class definition from yaml file
-    The file class_generator.py has the code which reads the yaml file and depending on the contents of the files
-    writes it to a python file named after the yaml file. The thing left out is to combine the definition with the
-    methods that use the class definitions.
+**Add users in Bulk**
+    At the moment, there is only an option to add single user from the yaml file. This needs to be extended to cover multiple users.
 
-Start mongo if mongo is not running while using the "cm management" commands
-    The file mongo.py has the code that is taken from mongo.py under fabfile directory in cloudmesh. This has three
+
+**Start mongo if mongo is not running while using the "cm management" commands**
+    The file mongo.py has the code that is taken from mongo.py under **fabfile** directory in cloudmesh. This has three
     methods: "get_status", "start" and "stop". Need to understand the way cm works and where to hook these methods.

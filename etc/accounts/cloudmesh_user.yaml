@@ -15,11 +15,9 @@ cloudmesh:
             - password:
                 label: New Password
                 type: password
-                required: True
             - confirm:
                 label: Confirm Password
                 type: password
-                required: True
             - title:
                 label: Title
                 type: text

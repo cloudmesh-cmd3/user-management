@@ -9,7 +9,9 @@ from cmd3.console import Console
 from tabulate import tabulate
 from texttable import Texttable
 from bson.objectid import ObjectId
-from cloudmesh_management.base_classes import User, Project, SubUser
+# from cloudmesh_management.base_classes import User, Project, SubUser
+from cloudmesh_management.base_project import Project
+from cloudmesh_management.base_user import User
 from mongoengine import fields
 
 ROLES_LIST = ["lead", "member", "alumni"]
@@ -54,7 +56,7 @@ class Projects(object):
     def __init__(self):
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         self.projects = Project.objects()
-        self.users = SubUser.objects()
+        self.users = User.objects()
 
     def __str__(self):
         """
@@ -100,13 +102,13 @@ class Projects(object):
             return
 
         """adds members to a particular project"""
-        user = SubUser.objects(username=user_name).first()
+        user = User.objects(username=user_name).first()
         project = Project.objects(project_id=project_id).first()
         if project:
             if user and role != 'alumni':
                 if role == "member":
                     Project.objects(project_id=project_id).update_one(push__members=user)
-                    SubUser.objects(username=user_name).update_one(push__projects=project)
+                    User.objects(username=user_name).update_one(push__projects=project)
                     Console.info("User `{0}` added as Project member.".format(user_name))
                 elif role == "lead":
                     Project.objects(project_id=project_id).update_one(push__lead=user)
@@ -126,7 +128,7 @@ class Projects(object):
         if role not in ROLES_LIST:
             Console.error("Invalid role `{0}`".format(role))
             return
-        user = SubUser.objects(username=user_name).first()
+        user = User.objects(username=user_name).first()
         if user and role != "alumni":
             if role == "member":
                 Project.objects(project_id=project_id).update_one(pull__members=user)
@@ -272,7 +274,7 @@ class Projects(object):
                     else:
                         cls.display_json(projects_dict, project_id)
                 else:
-                    Console.error("No projects in the database.")
+                    Console.info("No projects in the database.")
             else:
                 projects_json = Project.objects(project_id=project_id).to_json()
                 projects_list = json.loads(projects_json)

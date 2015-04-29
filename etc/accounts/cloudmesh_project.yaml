@@ -10,12 +10,12 @@ cloudmesh:
                 required: True
             - categories:
                 label: Project Category
-                type: dropdown
+                type: list
                 value: none
                 required: True
             - keywords:
                 label: Project Keywords
-                type: text
+                type: list
                 required: True
             - lead:
                 label: Project Lead
@@ -24,18 +24,18 @@ cloudmesh:
                 reference: user
             - managers:
                 label: Project Managers
-                type: textarea
+                type: list
                 required: True
+                reference: user
             - members:
                 label: Project Members
-                type: textarea
+                type: list
                 required: True
                 reference: user
             - alumnis:
                 label: Project Alumni
-                type: textarea
+                type: list
                 required: True
-                reference: user
             - contact:
                 label: Contact
                 type: text

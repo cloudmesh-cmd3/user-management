@@ -17,6 +17,8 @@ class CodeGenerator:
         self.code = []
         self.etc_path = ""
         self.filename = ""
+        self.headers = []
+        self.options = []
 
     def end(self):
         return string.join(self.code, "")
@@ -34,6 +36,28 @@ class CodeGenerator:
                 None
         """
         self.code.append(self.tab * self.level + snippet)
+
+    def set_headers(self, snippet):
+        """
+        The method is used to add the snippet as the header for python files, for example "import json"
+        :param snippet:
+                an import statement, for example, import json
+        :return:
+                None
+        """
+        self.headers.append(snippet)
+        self.headers.append("\n")
+
+    def set_options(self, key, options_list):
+        """
+        The method is used to add a list of options to be written to python files
+        :param snippet:
+                option item, for example, GRANT_ORGANIZATION = ('ABC','DEF')
+        :return:
+                None
+        """
+        self.options.append(key.upper()+" = "+options_list)
+        self.options.append("\n")
 
     def newline(self):
         self.code.append("\n")
@@ -67,7 +91,8 @@ class CodeGenerator:
                 False, for any issues
         """
         target = None
-        self.etc_path = os.sep.join(os.getcwd().split(os.sep)[:-1])+"/etc/"
+        self.etc_path = os.getcwd()+os.sep
+        # self.etc_path = os.sep.join(os.getcwd().split(os.sep)[:-1])+"/etc/"
         if not os.path.exists(self.etc_path):
             os.makedirs(self.etc_path)
         self.filename = self.etc_path+filename+".py"
@@ -79,11 +104,15 @@ class CodeGenerator:
         else:
             if target:
                 try:
+                    target.write(string.join(self.headers, ""))
+                    target.write("\n")
+                    target.write(string.join(self.options, ""))
                     target.write(snippet)
                 except IOError:
                     Console.error("Error in writing to file")
                     return False
             target.close()
+
             return True
 
 
@@ -106,7 +135,7 @@ class SourceCode:
                     If a collection name is not specified, uses the name of the file as the collection name.
         :return:
                 Writes the contents to a file under the etc directory. if an "etc" directory does not exist, it creates
-                one. The file name would be either "user.py" or "project.py" depending on the class_type
+                one. The file name would be either "base_user.py" or "base_project.py" depending on the class_type
         """
         code = CodeGenerator()
         file_path = "~/.cloudmesh/cloudmesh_" + class_type + ".yaml"
@@ -118,12 +147,9 @@ class SourceCode:
             return
         try:
             if class_type == "user":
-                code.write("from cloudmesh_database.dbconn import get_mongo_dbname_from_collection")
-                code.newline()
-                code.write("from cloudmesh_management.cloudmeshobject import CloudmeshObject")
-                code.newline()
-                code.write("from mongoengine import *")
-                code.newline()
+                code.set_headers("from cloudmesh_database.dbconn import get_mongo_dbname_from_collection")
+                code.set_headers("from cloudmesh_management.cloudmeshobject import CloudmeshObject")
+                code.set_headers("from mongoengine import *")
                 code.newline()
                 code.newline()
                 code.write("class "+class_type.title()+"(CloudmeshObject):")
@@ -167,11 +193,14 @@ class SourceCode:
                             field_type = "StringField"
                             if is_required:
                                 field_type += "(required=True)"
+                            else:
+                                field_type += "()"
                         elif _item[key].get('type') == 'checkbox':
                             if len(_item[key].get('options')) > 1:
                                 options = str(_item[key].get('options'))
+                                code.set_options(key, options)
                                 if is_required:
-                                    field_type = "ListField(choices="+options+", required=True)"
+                                    field_type = "ListField(StringField(choices="+key.upper()+"), required=True)"
                             else:
                                 field_type = "BooleanField(required=True)"
                         elif _item[key].get('type') == 'email':
@@ -184,17 +213,14 @@ class SourceCode:
                 code.write("projects = ListField(ReferenceField('Project'))")
                 # print code.end()
 
-                if not code.write_to_file(code.end(), class_type):
+                if not code.write_to_file(code.end(), "base_"+class_type):
                     Console.error("Error while trying to write to file.")
                     pass
 
             elif class_type == "project":
-                code.write("from cloudmesh_database.dbconn import get_mongo_dbname_from_collection")
-                code.newline()
-                code.write("from cloudmesh_management.cloudmeshobject import CloudmeshObject")
-                code.newline()
-                code.write("from mongoengine import *")
-                code.newline()
+                code.set_headers("from cloudmesh_database.dbconn import get_mongo_dbname_from_collection")
+                code.set_headers("from cloudmesh_management.cloudmeshobject import CloudmeshObject")
+                code.set_headers("from mongoengine import *")
                 code.newline()
                 code.newline()
                 code.write("class "+class_type.title()+"(CloudmeshObject):")
@@ -238,18 +264,36 @@ class SourceCode:
                             if _item[key].get('reference'):
                                 field_type = "ListField(ReferenceField('"+str(_item[key].get('reference')).title()+"'))"
                             elif _item[key].get('options'):
-                                options = str(_item[key].get('options'))
-                                field_type = "StringField(choices="+options+", required=True)"
+                                if len(_item[key].get('options')) > 1:
+                                    # options = str(_item[key].get('options'))
+                                    code.set_options(key, str(tuple(_item[key].get('options'))))
+                                    field_type = "ListField(StringField(choices="+key.upper()+"), required=True)"
                             else:
                                 field_type = "StringField"
                                 if is_required:
                                     field_type += "(required=True)"
                                 else:
                                     field_type += "()"
+                        elif _item[key].get('type') in ['list']:
+                            if _item[key].get('reference'):
+                                field_type = "ListField(ReferenceField('"+str(_item[key].get('reference')).title()+"'))"
+                            elif _item[key].get('options'):
+                                if len(_item[key].get('options')) > 1:
+                                    # options = str(_item[key].get('options'))
+                                    code.set_options(key, str(tuple(_item[key].get('options'))))
+                                    field_type = "ListField(StringField(choices="+key.upper()+"), required=True)"
+                            else:
+                                field_type = "ListField"
+                                if is_required:
+                                    field_type += "(required=True)"
+                                else:
+                                    field_type += "()"
                         elif _item[key].get('type') == 'checkbox':
                             if len(_item[key].get('options')) > 1:
-                                options = str(_item[key].get('options'))
-                                field_type = "ListField(choices="+options+", required=True)"
+                                if len(_item[key].get('options')) > 1:
+                                    # options = str(_item[key].get('options'))
+                                    code.set_options(key, str(tuple(_item[key].get('options'))))
+                                    field_type = "ListField(StringField(choices="+key.upper()+"), required=True)"
                             else:
                                 field_type = "BooleanField(required=True)"
                         elif _item[key].get('type') == 'email':
@@ -266,7 +310,7 @@ class SourceCode:
                         code.write(line)
                         code.newline()
                 # print code.end()
-                if not code.write_to_file(code.end(), class_type):
+                if not code.write_to_file(code.end(), "base_"+class_type):
                     Console.error("Error while trying to write to file.")
                     pass
 

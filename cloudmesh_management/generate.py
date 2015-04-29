@@ -1,7 +1,9 @@
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_management.project import Projects
 from cloudmesh_management.user import Users
-from cloudmesh_management.base_classes import Project, SubUser
+# from cloudmesh_management.base_classes import Project, SubUser
+from cloudmesh_management.base_user import User
+from cloudmesh_management.base_project import Project
 from cmd3.console import Console
 from faker import Factory
 from pprint import pprint
@@ -29,7 +31,7 @@ def random_user():
     """
     firstname = fake.first_name()
     prefix = fake.prefix()
-    data = SubUser(
+    data = User(
         status="pending",
         title=prefix[0],
         firstname=firstname,
@@ -75,7 +77,7 @@ def random_project():
     
     :rtype: dict
     """
-    user = SubUser.objects.first()
+    user = User.objects.first()
 
     data = Project(
         title=fake.sentence()[:30],
@@ -93,20 +95,20 @@ def random_project():
         broader_impact=fake.paragraph(),
         url=fake.url(),
         results=fake.sentence(),
-        agreement_user=True,
+        agreement_use=True,
         agreement_slides=True,
         agreement_support=True,
         agreement_software=True,
         agreement_documentation=True,
-        grant_organization="NSF",
+        grant_organization=["NSF"],
         grant_id="1001",
         grant_url=fake.url(),
-        resources_services=['hadoop', 'mapreduce', 'openstack'],
-        resources_software=['other'],
-        resources_clusters=['india'],
-        resources_provision=['paas'],
+        resources_services=['Hadoop'],
+        resources_software=['Other'],
+        resources_clusters=['India'],
+        resources_provision=['PaaS'],
         comment=fake.sentence(),
-        use_of_fg=fake.paragraph(),
+        use_of_fs=fake.paragraph(),
         scale_of_use=fake.paragraph(),
         comments=fake.sentence(),
         join_open=True,
@@ -142,7 +144,7 @@ def main():
     Test function to create 10 users and 3 projects
     """
 
-    generate_users(10)
+    # generate_users(10)
     generate_projects(3)
 
     print 70 * "="

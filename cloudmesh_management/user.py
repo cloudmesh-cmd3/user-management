@@ -1,5 +1,6 @@
 import json
 import sys
+import yaml
 
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_base.ConfigDict import ConfigDict
@@ -7,17 +8,45 @@ from cloudmesh_base.util import path_expand
 from cmd3.console import Console
 from passlib.hash import sha256_crypt
 from bson.objectid import ObjectId
-import yaml
 from texttable import Texttable
+from mongoengine import fields
 
-from cloudmesh_management.base_classes import SubUser, Project
 
+# from cloudmesh_management.base_classes import SubUser, Project
+from cloudmesh_management.base_user import User
+from cloudmesh_management.base_project import Project
 
 STATUS = ('pending', 'approved', 'blocked', 'denied', 'active', 'suspended')
 
 
 def implement():
     print "IMPLEMENT ME"
+
+
+def update_document(document, data_dict):
+    def field_value(field, values):
+        if field.__class__ in (fields.ListField, fields.SortedListField):
+            if values:
+                return str(values).split(", ")
+            else:
+                return []
+
+        if field.__class__ in (
+            fields.EmbeddedDocumentField,
+            fields.GenericEmbeddedDocumentField,
+            fields.ReferenceField,
+            fields.GenericReferenceField
+        ):
+            pass
+            # return field.document_type(**value)
+        else:
+            return values
+
+    [setattr(
+        document, key,
+        field_value(document._fields[key], value)
+    ) for key, value in data_dict.items()]
+    return document
 
 
 '''
@@ -37,7 +66,7 @@ def read_user(filename):
     """
     stream = open(filename, 'r')
     data = yaml.load(stream)
-    user = SubUser(
+    user = User(
         status=data["status"],
         username=data["username"],
         title=data["title"],
@@ -72,7 +101,7 @@ class Users(object):
         # port = config['cloudmesh']['server']['mongo']['port']
 
         # db = connect('manage', port=port)
-        self.users = SubUser.objects()
+        self.users = User.objects()
 
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
@@ -97,10 +126,10 @@ class Users(object):
         """
         new_proposal = proposal.lower()
         num = 1
-        username = SubUser.objects(username=new_proposal)
+        username = User.objects(username=new_proposal)
         while username.count() > 0:
             new_proposal = proposal + str(num)
-            username = SubUser.objects(username=new_proposal)
+            username = User.objects(username=new_proposal)
             num += 1
         return new_proposal
 
@@ -123,7 +152,7 @@ class Users(object):
     def delete_user(cls, user_name=None):
         if user_name:
             try:
-                user = SubUser.objects(username=user_name)
+                user = User.objects(username=user_name)
                 if user:
                     user.delete()
                     Console.info("User " + user_name + " removed from the database.")
@@ -175,7 +204,7 @@ class Users(object):
     def set_user_status(cls, user_name, status):
         if user_name:
             try:
-                SubUser.objects(username=user_name).update_one(set__status=status)
+                User.objects(username=user_name).update_one(set__status=status)
             except:
                 Console.error("Oops! Something went wrong while trying to amend user status")
         else:
@@ -185,7 +214,7 @@ class Users(object):
     def get_user_status(cls, user_name):
         if user_name:
             try:
-                user = SubUser.objects(username=user_name).only('status')
+                user = User.objects(username=user_name).only('status')
                 if user:
                     for entry in user:
                         return entry.status
@@ -202,7 +231,7 @@ class Users(object):
         :param email: email id of the user
         :return: true or false
         """
-        user = SubUser.objects(email=email)
+        user = User.objects(email=email)
         valid = user.count() == 0
         return valid
 
@@ -217,11 +246,11 @@ class Users(object):
         :type email: email address
         """
         if email is None:
-            return SubUser.objects()
+            return User.objects()
         else:
-            found = SubUser.objects(email=email)
+            found = User.objects(email=email)
             if found.count() > 0:
-                return SubUser.objects()[0]
+                return User.objects()[0]
             else:
                 return None
 
@@ -233,7 +262,7 @@ class Users(object):
         :param username:
         :type username:
         """
-        return SubUser.object(username=username)
+        return User.object(username=username)
 
     @classmethod
     def clear(cls):
@@ -241,7 +270,7 @@ class Users(object):
         Removes all elements form the mongo db that are users
         """
         try:
-            for user in SubUser.objects:
+            for user in User.objects:
                 user.delete()
             Console.info("Users cleared from the database.")
         except:
@@ -258,7 +287,7 @@ class Users(object):
                       "advisor", "address", "status", "projects"]
         try:
             if username is None:
-                user_json = SubUser.objects.only(*req_fields).to_json()
+                user_json = User.objects.only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
                     if disp_fmt != 'json':
@@ -266,9 +295,9 @@ class Users(object):
                     else:
                         cls.display_json(user_dict, username)
                 else:
-                    Console.error("No users in the database.")
+                    Console.info("No users in the database.")
             else:
-                user_json = SubUser.objects(username=username).to_json()
+                user_json = User.objects(username=username).to_json()
                 users_list = json.loads(user_json)
                 for item in users_list:
                     users_dict = item
@@ -287,12 +316,12 @@ class Users(object):
         required_fields = ["username", "firstname", "lastname", "projects"]
         try:
             if user_name:
-                user_json = SubUser.objects.only(*required_fields).to_json()
+                user_json = User.objects.only(*required_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
                     cls.display(user_dict, user_name)
                 else:
-                    Console.error("No user details available in the database.")
+                    Console.info("No user details available in the database.")
         except:
             Console.error("Please provide a username.")
 
@@ -377,6 +406,9 @@ class Users(object):
 
         try:
             user_config = file_config.get("cloudmesh", "user")
+            user_name = user_config['username']
+            user = User()
+            update_document(user, user_config)
         except:
             Console.error("Could not get user information from yaml file, "
                           "please check you yaml file, users information must be "
@@ -384,39 +416,25 @@ class Users(object):
             return
 
         try:
-            user_name = user_config['username']
-            user_string = "SubUser("
-            for key in user_config:
-                # print key, " - ", user_config[key]
-                user_string = user_string + key + "=\"" + user_config[key] + "\","
-            user_string += "status=\"pending\","
-            user_string += ")"
-            print user_string
-            data = eval(user_string)
-        except:
-            Console.error("User object creation failed.")
-            return
-
-        try:
             if cls.check_exists(user_name) is False:
-                cls.add(data)
+                cls.add(user)
                 Console.info("User created in the database.")
             else:
                 Console.error("User with user name " + user_name + " already exists.")
                 return
         except:
-            Console.error("User creation in database failed, " + str(sys.exc_info()[0]))
+            Console.error("User creation in database failed, " + str(sys.exc_info()))
             return
 
     @classmethod
     def check_exists(cls, user_name):
-        return len(SubUser.objects(username=user_name)) > 0
+        return len(User.objects(username=user_name)) > 0
 
     @classmethod
     def set_password(cls, user_name, passwd):
         pass_hash = sha256_crypt.encrypt(passwd)
         try:
-            SubUser.objects(username=user_name).update_one(set__password=pass_hash)
+            User.objects(username=user_name).update_one(set__password=pass_hash)
             Console.info("User password updated.")
         except:
             Console.error("Oops! Something went wrong while trying to set user password")

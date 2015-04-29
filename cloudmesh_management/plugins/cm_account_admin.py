@@ -52,7 +52,6 @@ class cm_account_admin:
             management import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
 
         Options:
-            --help          Show this screen
             --format=json   Show the user details in json format
         """
 

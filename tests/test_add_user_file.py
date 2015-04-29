@@ -2,7 +2,7 @@ from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_base.util import HEADING
 
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_management.user import SubUser
+from cloudmesh_management.base_user import User
 from cloudmesh_management.user import Users
 
 
@@ -28,7 +28,7 @@ class TestGenerate:
 
         user = Users()
         file_path = "etc/cloudmesh_user_info.yaml"
-        user.create_user_from_file()
+        user.create_user_from_file(file_path)
 
 
 
