@@ -7,7 +7,7 @@ The code is located at:
 
 * https://github.com/cloudmesh/management.git
 
-Assumptions:
+**Assumptions:**
 
 * Python 2.7.9 is installed
 * virtual environment is installed and setup (for example, virtualenv ~/ENV -p <path to python version 2.7.9>)
@@ -170,7 +170,7 @@ Note
 
     The user roles are member, lead, alumni. When adding a user as a member or lead, the USERID should be available
     within the database. If not an error message would be displayed. An alumni need not be a valid user within the
-    system. No no check will be done against the alumni role. When you add a user as a lead or a member, user will be
+    system. No check will be done against the alumni role. When you add a user as a lead or a member, user will be
     appended to the existing list accordingly.
 
 To remove a member from a project::
@@ -202,8 +202,7 @@ Note
 
     - To pass the username and password to access the database as parameters use --user=<USERNAME> and --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
-    - If <COLLECTION NAME> is not specified, the system tries to export all the non system collections to a json file
-    names after the collection.
+    - If <COLLECTION NAME> is not specified, the system tries to export all the non system collections to a json file and the file name would be the name of the collection.
 
 
 To import data from json file into a database::
