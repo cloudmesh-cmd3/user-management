@@ -38,9 +38,18 @@ If you are starting from scratch, the commands that needs to be run are listed b
     python setup.py requirements
     python setup.py install
 
+.. IMPORTANT::
+
+    The fields of the User and Project objects can be generated dynamically from the YAML file in the directory
+    "etc/accounts". To add/remove fields, amend the YAML file as required. After making the amendments, follow the steps
+    below:
+
+    cp etc/accounts/cloudmesh_user.yaml ~/.cloudmesh/cloudmesh_user.yaml
+    cp etc/accounts/cloudmesh_project.yaml ~/.cloudmesh/cloudmesh_project.yaml
+
 If everything is setup correctly, run the following command::
 
-    cm management -h
+    cm management --help
 
 You should see the screen below::
 
