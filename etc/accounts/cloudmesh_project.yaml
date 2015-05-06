@@ -1,0 +1,210 @@
+meta:
+    yaml_version: 2.1
+    kind: management
+cloudmesh:
+    project:
+        fields:
+            - title:
+                label: Title
+                type: text
+                required: True
+            - categories:
+                label: Project Category
+                type: list
+                value: none
+                required: True
+            - keywords:
+                label: Project Keywords
+                type: list
+                required: True
+            - lead:
+                label: Project Lead
+                type: text
+                required: True
+                reference: user
+            - managers:
+                label: Project Managers
+                type: list
+                required: True
+                reference: user
+            - members:
+                label: Project Members
+                type: list
+                required: True
+                reference: user
+            - alumnis:
+                label: Project Alumni
+                type: list
+                required: True
+            - contact:
+                label: Contact
+                type: text
+                required: True
+            - orientation:
+                label: Orientation
+                type: dropdown
+                value: none
+                required: true
+            - primary_discipline:
+                label: Primary discipline
+                type: dropdown
+                value: none
+                required: true
+            - abstract:
+                label: Abstract
+                type: textarea
+                required: true
+            - intellectual_merit:
+                label: Merit
+                type: textarea
+                required: true
+            - broader_impact:
+                label: Broader Impact
+                type: textarea
+                required: true
+            - url:
+                label: URL
+                type: text
+                required: true
+            - results:
+                label: Results
+                type: textarea
+                required: true
+            - agreement_use:
+                label: NSF agreement to use Future Systems
+                type: checkbox
+                options:
+                - ""
+                required: True
+            - agreement_slides:
+                label: Slide collection
+                type: checkbox
+                options:
+                - ""
+                required: True
+            - agreement_support:
+                label: Support
+                type: checkbox
+                options:
+                - ""
+                required: True
+            - agreement_software:
+                label: Software Contributions
+                type: checkbox
+                options:
+                - ""
+                required: True
+            - agreement_documentation:
+                label: Documentation Contributions
+                type: checkbox
+                options:
+                - ""
+                required: True
+            - grant_organization:
+                label: Grant Organization
+                type: text
+                options:
+                    - NSF
+                    - DOE
+                    - DoD
+                    - NIH
+                    - other
+                    - None
+                required: False
+            - grant_id:
+                label: ID
+                type: text
+                required: False
+            - grant_url:
+                label: URL
+                type: url
+                required: False
+            - resources_services:
+                label: Resource Services
+                type: checkbox
+                options:
+                    - Eucalyptus
+                    - Openstack
+                    - MPI
+                    - Hadoop
+                    - Mapreduce
+                    - Docker
+                    - Other
+                    - None
+                required: True
+            - resources_software:
+                label: Resource Software
+                type: checkbox
+                options:
+                    - HPC
+                    - Other
+            - resources_clusters:
+                label: Resource Clusters
+                type: checkbox
+                options:
+                    - India
+                    - Bravo
+                    - Echo
+                    - Delta
+                    - Other
+                    - None
+            - resources_provision:
+                label: Resource Provisioning
+                type: checkbox
+                options:
+                    - VM
+                    - Baremetal
+                    - Container
+                    - IaaS
+                    - PaaS
+                    - Other
+                    - None
+                required: True
+            - comment:
+                label: Comment
+                type: textarea
+                required: True
+            - use_of_fs:
+                label: Use of Future Systems
+                type: textarea
+                required: True
+            - scale_of_use:
+                label: Scale of use
+                type: textarea
+                required: True
+            - comments:
+                label: Comments
+                type: textarea
+                required: True
+            - join_open:
+                label: Allow users to request to join
+                type: checkbox
+                options:
+                - " "
+            - join_notification:
+                label: Send an email notification when a user joins
+                type: checkbox
+                options:
+                - " "
+            - loc_name:
+                label: Name
+                type: text
+                required: True
+            - loc_street:
+                label: Street
+                type: text
+                required: True
+            - loc_additional:
+                label: Additional
+                type: textarea
+                required: True
+            - loc_state:
+                label: State
+                type: dropdown
+                value: none
+                required: True
+            - loc_country:
+                label: Country
+                type: dropdown
+                value: countries.txt
+                required: True

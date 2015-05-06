@@ -1,0 +1,41 @@
+meta:
+    yaml_version: 2.1
+    kind: management
+cloudmesh:
+    project:
+        title: Testing Apache Cluster
+        categories: FutureSystems, Database
+        lead:
+        managers:
+        members:
+        keywords: sqllite
+        alumnis: "user1, user2, user3"
+        contact: "SOIC, IU"
+        orientation: "Lot's of all make"
+        primary_discipline: other
+        abstract: "Test Test Test Test Test"
+        intellectual_merit: "Test Test Test Test Test"
+        broader_impact: "Test Test Test Test Test"
+        url: http://www.example.com
+        results: "Test Test Test Test Test"
+        grant_organization: NSF
+        grant_id: "1001"
+        grant_url: http://www.example.com
+        resources_services: hadoop, mapreduce, openstack
+        resources_software: other
+        resources_clusters: india
+        resources_provision: paas
+        comment: "This is a comment"
+        use_of_fg: "Fake use of FutureSystems"
+        scale_of_use: "Fake use of scale"
+        comments: "Fake of comments"
+        join_open: True
+        join_notification: True
+        loc_name: "United States(US)"
+        loc_street: "Fake Street Name"
+        loc_additional: None
+        loc_state: "Indiana"
+        loc_country: "United States(US)"
+        active: False
+
+
