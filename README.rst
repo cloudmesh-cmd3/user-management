@@ -50,9 +50,8 @@ If you are starting from scratch, the commands that needs to be run are listed b
     python setup.py install
     python setup.py yaml
 
-^^^^^^^^^
-Important
-^^^^^^^^^
+
+.. Important::
 
     The fields of the User and Project objects can be generated dynamically from the YAML file in the directory
     "etc/accounts". A default file for **user** is available under etc/accounts/cloudmesh_user.yaml and a default file for
@@ -166,9 +165,7 @@ To add a user using a YAML file::
 
     cm management user add <PATH TO YAML FILE>
 
-^^^^
-Note
-^^^^
+.. Note::
 
     A sample YAML file is available in etc directory within managament
 
@@ -177,13 +174,12 @@ To amend a status of the user::
     * User will be in pending state by default
     * The commands to change the user status are self explanatory
 
-^^^^
-Note
-^^^^
 
-The state changes for a user is listed in the figure below:
+.. Note::
 
-..  figure:: docs/management_states.png
+    The state changes for a user is listed in the figure below:
+
+.. figure:: docs/management_states.png
 
 Manage Projects
 ===============
@@ -205,9 +201,7 @@ To add a member to a project::
     cm management project add member <USERID> <PROJECTID> <ROLE>
 
 
-^^^^
-Note
-^^^^
+.. Note::
 
     The user roles are member, lead, alumni. When adding a user as a member or lead, the USERID should be available
     within the database. If not an error message would be displayed. An alumni need not be a valid user within the
@@ -237,9 +231,7 @@ To export collection(s) from a database::
 
     cm management export <DATABASENAME> <COLLECTION NAME>
 
-^^^^
-Note
-^^^^
+.. Note::
 
     - To pass the username and password to access the database as parameters use --user=<USERNAME> and --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
@@ -254,9 +246,7 @@ To import data from json file into a database::
 
     cm management import --dir=<DIR NAME> --db=<DATABASE NAME>
 
-^^^^
-Note
-^^^^
+.. Note::
 
     - To pass the username and password to access the database as parameters use --user=<USERNAME> and --password=<PASSWORD>. If the username and password is not passed, the system tried to get the details from the file, cloudmesh_server.yaml. If the details are not available in the yaml file, it tries to connect without them.
 
