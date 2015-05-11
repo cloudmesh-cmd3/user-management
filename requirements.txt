@@ -1,4 +1,3 @@
-bson
 faker
 future
 sh
@@ -11,9 +10,9 @@ prettytable
 pytimeparse
 cloudmesh_base
 mongoengine
-cloudmesh_database
 tabulate
 cmd3
 fake-factory
 passlib
+cloudmesh
 texttable

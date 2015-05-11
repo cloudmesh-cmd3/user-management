@@ -14,6 +14,11 @@ The code is located at:
 * Cloudmesh is installed
 * mongo server is running (fab server.start)
 
+Clone the module for bson and build it::
+
+    git clone https://github.com/martinkou/bson.git
+    python setup.py install
+
 Clone the project with::
 
     git clone https://github.com/cloudmesh/management.git
@@ -30,13 +35,20 @@ Install the module::
 
     python setup.py install
 
+Install the YAML files::
+
+    python setup.py yaml
+
 If you are starting from scratch, the commands that needs to be run are listed below::
 
+    git clone https://github.com/martinkou/bson.git
+    python setup.py install
     pip install cloudmesh_base
     pip install cmd3
     pip install cloudmesh_database
     python setup.py requirements
     python setup.py install
+    python setup.py yaml
 
 ^^^^^^^^^
 Important
@@ -44,13 +56,42 @@ Important
 
     The fields of the User and Project objects can be generated dynamically from the YAML file in the directory
     "etc/accounts". A default file for **user** is available under etc/accounts/cloudmesh_user.yaml and a default file for
-    **project** is available under etc/accounts/cloudmesh_project.yaml. To add/remove fields, amend the YAML file as required.
+    **project** is available under etc/accounts/cloudmesh_project.yaml. To add/remove fields, amend the YAML file as required. When
+    you do "python setup.py yaml", the files are moved to "~/.cloudmesh/accounts" directory.
 
-If you make any amendments, follow the steps below::
+How to add/amend fields to the YAML file::
 
-    cp etc/accounts/cloudmesh_user.yaml ~/.cloudmesh/cloudmesh_user.yaml
-    cp etc/accounts/cloudmesh_project.yaml ~/.cloudmesh/cloudmesh_project.yaml
-    python setup.py install
+    * Amend the file(s) under etc/accounts/
+    * The fields are listed under::
+        cloudmesh:
+            user:
+                fields:
+    * Each field is described as shown below::
+        - <Field Name>:
+            label: <Label for field>
+            type: <Field type>
+            required: <True/False>
+            reference: <Reference field>[OPTIONAL]
+            options:
+                - option 1
+                - option 2
+                - option n
+
+    * The field type can be: text, textarea, dropdown, password, list, checkbox, email
+    * If any of the field, references to an existing field, "reference: " needs to be set to the existing field
+    * If a field has options, "options: ", needs to be set as shown above
+    * If the field is in [text, textarea, dropdown, password] and has a reference field, the field is mapped as a ListField[ReferenceField]
+    * If the field is in [text, textarea, dropdown, password] and has options, the field is mapped as a ListField[StringField]
+    * If the field is just in [text, textarea, dropdown, password], the field is mapped as a StringField
+    * If the field is a checkbox, the field is mapped to a BooleanField
+    * If the field is a email, the field is mapped to a EmailField
+    * UUIDField() is being used to generate a Project ID and User ID
+
+If you make any amendments to the file under "etc/accounts", follow the steps below::
+
+    * python setup.py resetyaml
+    * python setup.py regenfile (This regenerates the files base_user.py and base_project.py under cloudmesh_management)
+    * python setup.py install
 
 
 If everything is setup correctly, run the following command::
@@ -133,8 +174,8 @@ Note
 
 To amend a status of the user::
 
-* User will be in pending state by default
-* The commands to change the user status are self explanatory
+    * User will be in pending state by default
+    * The commands to change the user status are self explanatory
 
 ^^^^
 Note

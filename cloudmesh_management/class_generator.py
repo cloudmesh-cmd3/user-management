@@ -91,11 +91,12 @@ class CodeGenerator:
                 False, for any issues
         """
         target = None
-        self.etc_path = os.getcwd()+os.sep
+        self.etc_path = os.getcwd()+os.sep+"cloudmesh_management"+os.sep
         # self.etc_path = os.sep.join(os.getcwd().split(os.sep)[:-1])+"/etc/"
         if not os.path.exists(self.etc_path):
             os.makedirs(self.etc_path)
         self.filename = self.etc_path+filename+".py"
+        Console.info("File: {0} regenerated.".format(self.filename))
         try:
             target = open(self.filename, 'w+')
         except IOError:
@@ -138,7 +139,8 @@ class SourceCode:
                 one. The file name would be either "base_user.py" or "base_project.py" depending on the class_type
         """
         code = CodeGenerator()
-        file_path = "~/.cloudmesh/cloudmesh_" + class_type + ".yaml"
+        file_path = "~/.cloudmesh/{0}/cloudmesh_{1}.yaml".format("accounts", class_type)
+        # file_path = "~/.cloudmesh/cloudmesh_" + class_type + ".yaml"
         try:
             filename = path_expand(file_path)
             file_config = ConfigDict(filename=filename)
