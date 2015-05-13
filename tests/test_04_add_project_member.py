@@ -1,13 +1,12 @@
-from pprint import pprint
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
-from cloudmesh_base.util import banner
+from cloudmesh_management.base_user import User
+from cloudmesh_management.base_project import Project
 
-from cloudmesh_management.project import Project, Projects
-from cloudmesh_management.user import SubUser
+from cloudmesh_management.project import Projects
 
 
-class TestGenerate:
+class TestAddProjectMember:
     yaml_dir = "~/.cloudmesh_yaml"
     firstname = "gergor"
 
@@ -26,16 +25,19 @@ class TestGenerate:
     def _xyz(self):
         print("hallo")
 
-    def test_generate(self):
+    def test_addprojectmember(self):
         HEADING()
+        """
+        Test to add a member to an existing project
+        """
 
         self._xyz()
-        user_name = 'nicolas'
-        project_id = '5fda88ab86094cb6963f3b231f92ed9e'
+        user = User.objects.first()
+        project = Project.objects.first()
+        user_name = user.username
+        project_id = project.project_id
         project = Projects()
         project.add_user(user_name, project_id, 'member')
-        # user = User.objects(username=user_name).first()
-        # print user
-        # Project.objects(project_id=project_id).update_one(push__members=user)
+        project.list_projects(project_id=project_id)
 
 

@@ -1,12 +1,12 @@
 from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 from cloudmesh_management.project import Projects
 from cloudmesh_management.user import Users
-# from cloudmesh_management.base_classes import Project, SubUser
 from cloudmesh_management.base_user import User
 from cloudmesh_management.base_project import Project
 from cmd3.console import Console
 from faker import Factory
 from pprint import pprint
+from passlib.hash import sha256_crypt
 import uuid
 
 get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
@@ -39,7 +39,7 @@ def random_user():
         email=fake.safe_email(),
         username=firstname.lower(),
         active=False,
-        password=fake.word(),
+        password=sha256_crypt.encrypt("MyPassword"),
         phone=fake.phone_number(),
         department="IT",
         institution=fake.company(),

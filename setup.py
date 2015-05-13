@@ -2,11 +2,9 @@
 
 import os
 import shutil
-from cloudmesh_management.class_generator import CodeGenerator
 
 from setuptools import setup, find_packages
 from setuptools.command.install import install
-
 from cmd3.console import Console
 
 
@@ -182,7 +180,7 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 2.7.9',
         'Topic :: Database',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Scientific/Engineering',

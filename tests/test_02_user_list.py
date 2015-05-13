@@ -1,14 +1,10 @@
-from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
+from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
-
-from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
-from cloudmesh_management.base_user import User
 from cloudmesh_management.user import Users
 
 
-class TestGenerate:
+class TestListUsers:
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -23,12 +19,18 @@ class TestGenerate:
         pass
 
 
-    def test_generate(self):
+    def test_listusers(self):
         HEADING()
 
+        """
+        Test to list users in default format followed by JSON format
+        """
+
         user = Users()
-        file_path = "etc/cloudmesh_user_info.yaml"
-        user.create_user_from_file(file_path)
+        print "Listing users in default format"
+        user.list_users()
+        print "Listing users in JSON format"
+        user.list_users(display_fmt='json')
 
 
 

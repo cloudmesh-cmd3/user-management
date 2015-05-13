@@ -277,7 +277,7 @@ class Users(object):
             Console.error("Oops! Something went wrong while trying to clear the users from database")
 
     @classmethod
-    def list_users(cls, disp_fmt=None, username=None):
+    def list_users(cls, display_fmt=None, username=None):
         # req_fields = ["username", "title", "firstname", "lastname",
         # "email", "phone", "url", "citizenship",
         #               "institution", "institutionrole", "department",
@@ -290,7 +290,7 @@ class Users(object):
                 user_json = User.objects.only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
-                    if disp_fmt != 'json':
+                    if display_fmt != 'json':
                         cls.display(user_dict, username)
                     else:
                         cls.display_json(user_dict, username)
@@ -302,7 +302,7 @@ class Users(object):
                 for item in users_list:
                     users_dict = item
                     if users_dict:
-                        if disp_fmt != 'json':
+                        if display_fmt != 'json':
                             cls.display_two_columns(users_dict)
                         else:
                             cls.display_json(users_dict, username)

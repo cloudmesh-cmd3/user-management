@@ -1,11 +1,13 @@
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
-from cloudmesh_management.user import Users
+
+from cloudmesh_management.generate import generate_users
+from cloudmesh_management.generate import generate_projects
+from cloudmesh_management.dbutil import DBUtil
 
 
-class TestGenerate:
+class TestExportCollection:
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -19,14 +21,17 @@ class TestGenerate:
         # HEADING()
         pass
 
+    def _xyz(self):
+        print("hallo")
 
-    def test_generate(self):
+    def test_exportcollection(self):
         HEADING()
 
-        user = Users()
-        display_fmt = 'json'
-        user_name = 'gregg'
-        user.list_users(disp_fmt='json', username=user_name)
-
+        """
+        Test to export a collection in json format to a directory named "dumps"
+        """
+        self._xyz()
+        db = DBUtil()
+        db.serialize(db="manage", collection="cloudmesh_object")
 
 

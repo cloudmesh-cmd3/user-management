@@ -279,8 +279,7 @@ class DBUtil:
         pass
 
 
-
 if __name__ == "__main__":
     db = DBUtil()
-    db._connect(collection="manage")
+    db.connect(collection="manage")
     # db.serialize(db="manage", collection="user")

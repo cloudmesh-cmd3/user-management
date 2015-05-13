@@ -1,15 +1,10 @@
-from pprint import pprint
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
-from cloudmesh_base.util import banner
-
-from cloudmesh_management.project import Project, Projects
-from cloudmesh_management.user import SubUser
+from cloudmesh_management.project import Projects
 
 
-class TestGenerate:
+class TestListProjects:
     yaml_dir = "~/.cloudmesh_yaml"
-    firstname = "gergor"
 
     def setup(self):
         # HEADING()
@@ -23,14 +18,16 @@ class TestGenerate:
         # HEADING()
         pass
 
-
-    def test_generate(self):
+    def test_listprojects(self):
         HEADING()
-
+        """
+        Test to list projects in default format followed by JSON format
+        """
         project = Projects()
-        display_fmt = 'json'
-        project_id = 'dbe4baed060242549c92fda3d047fb92'
-        project.list_projects(project_id=project_id)
+        print "Listing in default format"
+        project.list_projects()
+        print "Listing in JSON format"
+        project.list_projects(display_fmt='json')
 
 
 
