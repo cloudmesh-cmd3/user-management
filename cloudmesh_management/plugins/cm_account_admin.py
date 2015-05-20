@@ -8,6 +8,7 @@ from cloudmesh_management.user import Users
 from cloudmesh_management.project import Projects
 from cloudmesh_management.dbutil import DBUtil
 
+
 def get_version():
     import cloudmesh_management
     return cloudmesh_management.version

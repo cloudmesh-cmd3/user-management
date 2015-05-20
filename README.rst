@@ -153,6 +153,10 @@ To set a password for a user::
 
     cm management user password <USERNAME> <PASSWORD>
 
+.. note::
+
+    The password is encrypted using sha256 encryption algorithm and the hash value is stored in Mongo.
+
 To get a list of users run::
 
     cm management user list
