@@ -1,11 +1,11 @@
 from flask import Flask
 from cloudmesh_management.user import Users
+from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return "Hello, World!"
+get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
+
 
 @app.route('/management/api/v1.0/users', methods=['GET'])
 def list_users():

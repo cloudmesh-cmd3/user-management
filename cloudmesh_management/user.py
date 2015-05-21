@@ -2,7 +2,7 @@ import json
 import sys
 import yaml
 
-from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
+from cloudmesh_database.dbconn import get_mongo_dbname_from_collection, get_mongo_db, DBConnFactory
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
@@ -107,7 +107,7 @@ class Users(object):
         if db_name:
             meta = {'db_alias': db_name}
 
-            # get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
+        # get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 
     @classmethod
     def objects(cls):
@@ -218,6 +218,8 @@ class Users(object):
                 if user:
                     for entry in user:
                         return entry.status
+                else:
+                    return
             except:
                 Console.error("Oops! Something went wrong while trying to get user status")
         else:

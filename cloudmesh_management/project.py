@@ -473,14 +473,19 @@ class Projects(object):
                     Console.error("Cannot activate project. Project is not in pending/blocked status.")
             elif new_status == "block":
                 if current_status in ["active", "pending"]:
-                    cls.set_project_status(project_id, new_status)
+                    cls.set_project_status(project_id, "blocked")
                 else:
                     Console.error("Cannot block project. Project is not active or pending.")
             elif new_status == "close":
                 if current_status in ["active", "pending", "blocked"]:
-                    cls.set_project_status(project_id, new_status)
+                    cls.set_project_status(project_id, "closed")
                 else:
                     Console.error("Cannot close project. Project is not active/pending/blocked.")
+            elif new_status == "open":
+                if current_status  == "closed":
+                    cls.set_project_status(project_id, "pending")
+                else:
+                    Console.error("Cannot close project. Project is not closed.")
         else:
             Console.error("Please specify the project to be amended")
 

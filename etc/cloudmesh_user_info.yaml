@@ -3,19 +3,19 @@ meta:
     kind: management
 cloudmesh:
     user:
-        username: avaradha
-        email: avaradha@indiana.edu
+        username: abc
+        email: abc@indiana.edu
         title: Mr.
-        firstname: Aravindh
-        lastname: Varadharaju
+        firstname: Abc
+        lastname: Def
         phone: 111 111 1111
         url: www.example.com
-        citizenship: India(IN)
+        citizenship: United States(US)
         bio: This is my test Bio
         institution: IUB
         institutionrole: Graduate Masters
         department: Computer Science
         address: Indiana University, Bloomington
         advisor: TBD
-        country: India(IN)
+        country: United States(US)
 
