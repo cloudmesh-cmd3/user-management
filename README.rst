@@ -130,8 +130,7 @@ You should see the screen below::
                 management admin project remove [USERNAME] [PROJECTID] [ROLE]
                 management admin export [DATABASE] [COLLECTION] [--user=USERNAME] [--password=PASSWORD]
                 management admin import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
-                management committee setup [PROJECTID]
-                management committee remove [PROJECTID]
+                management committee setup
                 management committee reviewer add [PROJECTID] [USERNAME]
                 management committee reviewer remove [PROJECTID] [USERNAME]
                 management committee list
@@ -153,8 +152,26 @@ You should see the screen below::
                 --format=json   Show the user details in json format
 
 
-Steps
-=====
+Workflow
+========
+
+User
+    - User applies for an account using "cm management user apply --user=USERFILE
+    - Configure user using "cm management user configure [USERNAME]
+
+Admin
+    - On getting notified (Notification is yet to be implemented), Check user status using "cm management admin user status"
+    - Approve and activate the user using "cm management admin user approve USERNAME" and "cm management admin user activate USERNAME"
+    - Assign a role if the user is other than a non-normal user using "cm management admin user assign [USERNAME] [ROLE]"
+
+Committee
+    - While setting up the system, set up a committee using the command "cm management committee setup"
+    - On getting notified (Notification is yet to be implemented) about project approval request:
+        - Approve a project using the command "cm management committee project approve [PROJECTID]"
+        - Deny a project using the command "cm management committee project deny [PROJECTID]
+
+Initialize the system
+======================
 
 Steps to initialize the system::
 

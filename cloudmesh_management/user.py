@@ -310,7 +310,7 @@ class Users(object):
 
     @classmethod
     @requires_roles('admin')
-    def list_users(cls, display_fmt=None, username=None):
+    def list_users(cls, display_fmt=None, username=None, status=None):
         # req_fields = ["username", "title", "firstname", "lastname",
         # "email", "phone", "url", "citizenship",
         #               "institution", "institutionrole", "department",
@@ -320,7 +320,14 @@ class Users(object):
                       "advisor", "address", "status", "projects", "roles"]
         try:
             if username is None:
-                user_json = User.objects.only(*req_fields).to_json()
+                if status:
+                    if status not in STATUS:
+                        Console.info("Invalid status requested.. Displaying all users..")
+                        user_json = User.objects.only(*req_fields).to_json()
+                    else:
+                        user_json = User.objects(status=status).only(*req_fields).to_json()
+                else:
+                    user_json = User.objects.only(*req_fields).to_json()
                 user_dict = json.loads(user_json)
                 if user_dict:
                     if display_fmt != 'json':

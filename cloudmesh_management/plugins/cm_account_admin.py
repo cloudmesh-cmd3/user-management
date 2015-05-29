@@ -33,7 +33,7 @@ class cm_account_admin:
         Usage:
             management version
             management admin user generate [--count=N]
-            management admin user list [USERNAME] [--format=FORMAT]
+            management admin user list [USERNAME] [--format=FORMAT] [--status=STATUS]
             management admin user add [YAMLFILE]
             management admin user delete [USERNAME]
             management admin user clear
@@ -59,12 +59,11 @@ class cm_account_admin:
             management admin project remove [USERNAME] [PROJECTID] [ROLE]
             management admin export [DATABASE] [COLLECTION] [--user=USERNAME] [--password=PASSWORD]
             management admin import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
-            management committee setup [PROJECTID]
-            management committee remove [PROJECTID]
+            management committee setup
             management committee reviewer add [PROJECTID] [USERNAME]
             management committee reviewer remove [PROJECTID] [USERNAME]
             management committee list
-            management committee project list [PROJECTID] [--format=FORMAT]
+            management committee project list [PROJECTID] [--format=FORMAT] [--status=STATUS]
             management committee project status
             management committee project approve [PROJECTID]
             management committee project deny [PROJECTID]
@@ -97,11 +96,14 @@ class cm_account_admin:
                 user = Users()
                 display_fmt = None
                 user_name = None
+                status = None
                 if arguments['--format']:
                     display_fmt = arguments['--format']
                 if arguments['USERNAME']:
                     user_name = arguments['USERNAME']
-                user.list_users(display_fmt, user_name)
+                if arguments['--status']:
+                    status = arguments['--status']
+                user.list_users(display_fmt, user_name, status)
             elif arguments['admin'] and arguments['user'] and arguments['add']:
                 user = Users()
                 user.create_user_from_file(arguments['YAMLFILE'])
@@ -296,12 +298,8 @@ class cm_account_admin:
             #
             #
             elif arguments['committee'] and arguments['setup']:
-                if arguments['PROJECTID']:
-                    project_id = arguments['PROJECTID']
-                    committee = Committees()
-                    committee.setup_committee(project_id)
-                else:
-                    Console.error("Please specify a valid project ID.")
+                committee = Committees()
+                committee.setup_committee()
             elif arguments['committee'] and arguments['remove']:
                 if arguments['PROJECTID']:
                     project_id = arguments['PROJECTID']
