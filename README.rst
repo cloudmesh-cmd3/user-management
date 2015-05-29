@@ -328,8 +328,8 @@ Yet to be done
 **Notification Mechanisms**
     When the user applies for an account/project, notification needs to be put in place to let the admin/reviewer know about the pending account/project request.
 
-**Authentication**
-    Authentication is yet to be done
+**Authentication and Security**
+    Authentication and Security is yet to be done
 
 **Add users in Bulk**
     At the moment, there is only an option to add single user from the yaml file. This needs to be extended to cover multiple users.
