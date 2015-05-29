@@ -3,6 +3,7 @@ from cloudmesh_base.util import HEADING
 
 from cloudmesh_management.generate import generate_users
 from cloudmesh_management.generate import generate_projects
+from cloudmesh_management.mongo import Mongo
 
 
 class TestGenerate:
@@ -13,6 +14,8 @@ class TestGenerate:
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
             meta = {'db_alias': db_name}
+        obj = Mongo()
+        obj.check_mongo()
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
 
@@ -30,7 +33,7 @@ class TestGenerate:
         Test to generate 10 users and 10 projects
         """
         self._xyz()
-        generate_users(10)
+        generate_users(1)
         generate_projects(10)
         #
         # banner("Find")

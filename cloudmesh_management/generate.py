@@ -8,7 +8,12 @@ from faker import Factory
 from pprint import pprint
 from passlib.hash import sha256_crypt
 import uuid
+from cloudmesh_base.util import banner
+from cloudmesh_management.mongo import Mongo
 
+
+obj = Mongo()
+obj.check_mongo()
 get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
 
 # --------------------------------------------

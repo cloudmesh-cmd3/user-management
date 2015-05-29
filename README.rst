@@ -99,39 +99,87 @@ If everything is setup correctly, run the following command::
 
 You should see the screen below::
 
-    management - Command line option to manage users and projects
+    management: Command line for Administrators to manage users and projects
 
-        Usage:
-            management version
-            management user generate [--count=N]
-            management user list [USERNAME] [--format=FORMAT]
-            management user add [YAMLFILE]
-            management user delete [USERNAME]
-            management user clear
-            management user status USERNAME
-            management user approve [USERNAME]
-            management user activate [USERNAME]
-            management user suspend [USERNAME]
-            management user block [USERNAME]
-            management user deny [USERNAME]
-            management user password USERNAME PASSWORD
-            management user projects USERNAME
-            management project generate [--count=N]
-            management project list [PROJECTID] [--format=FORMAT]
-            management project add [YAMLFILE]
-            management project delete [PROJECTID]
-            management project clear
-            management project status [PROJECTID]
-            management project activate [PROJECTID]
-            management project deactivate [PROJECTID]
-            management project close [PROJECTID]
-            management project add [USERNAME] [PROJECTID] [ROLE]
-            management project remove [USERNAME] [PROJECTID] [ROLE]
-            management export [DATABASE] [COLLECTION] [--user=USERNAME] [--password=PASSWORD]
-            management import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
+            Usage:
+                management version
+                management admin user generate [--count=N]
+                management admin user list [USERNAME] [--format=FORMAT]
+                management admin user add [YAMLFILE]
+                management admin user delete [USERNAME]
+                management admin user clear
+                management admin user status USERNAME
+                management admin user approve [USERNAME]
+                management admin user activate [USERNAME]
+                management admin user suspend [USERNAME]
+                management admin user block [USERNAME]
+                management admin user deny [USERNAME]
+                management admin user assign [USERNAME] [ROLE]
+                management admin user password USERNAME PASSWORD
+                management admin user projects USERNAME
+                management admin project generate [--count=N]
+                management admin project list [PROJECTID] [--format=FORMAT]
+                management admin project add [YAMLFILE]
+                management admin project delete [PROJECTID]
+                management admin project clear
+                management admin project status [PROJECTID]
+                management admin project activate [PROJECTID]
+                management admin project deactivate [PROJECTID]
+                management admin project close [PROJECTID]
+                management admin project add [USERNAME] [PROJECTID] [ROLE]
+                management admin project remove [USERNAME] [PROJECTID] [ROLE]
+                management admin export [DATABASE] [COLLECTION] [--user=USERNAME] [--password=PASSWORD]
+                management admin import [--file=FILENAME] [--dir=DIRNAME] [--db=DBNAME] [--collection=NAME]  [--user=USERNAME] [--password=PASSWORD]
+                management committee setup [PROJECTID]
+                management committee remove [PROJECTID]
+                management committee reviewer add [PROJECTID] [USERNAME]
+                management committee reviewer remove [PROJECTID] [USERNAME]
+                management committee list
+                management committee project list [PROJECTID] [--format=FORMAT]
+                management committee project status
+                management committee project approve [PROJECTID]
+                management committee project deny [PROJECTID]
+                management committee project block [PROJECTID]
+                management committee project activate [PROJECTID]
+                management committee project close [PROJECTID]
+                management committee project open [PROJECTID]
+                management user apply [--user=USERFILE|--project=PROJECTFILE]
+                management user configure [USERNAME]
+                management user password
+                management user status
+                management user add-sshkey [FILENAME]
 
-        Options:
-            --format=json   Show the user details in json format
+            Options:
+                --format=json   Show the user details in json format
+
+
+Steps
+=====
+
+Steps to initialize the system::
+
+    cm management user configure [USERNAME]
+        - This step puts an entry into the local hidden file under "**~/.cloudmesh/accounts/.config**"
+
+Roles
+=====
+
+There are three roles at the moment in the system.
+
+    User (user)
+        General user
+    Admin (admin)
+        Role used to manage users like add/delete users, change user status, assign user role and assign password
+    Reviewer (reviewer)
+        Role used to add/remove reviewers, approve projects
+
+Note::
+
+    - When the system is installed, a super user named "super" is created with all the 3 roles assigned to it.
+    - The Authorization is being imposed by a decorator function, which checks the roles assigned to the current user.
+    - If the user has the required roles, the information is displayed else an error message is thrown.
+    - The name of the current user is stored in a hidden configuration file under "**~/.cloudmesh/accounts/.config**"
+    - This file can be used to store secret keys for the user later when authentication mechanism is being built.
 
 
 Manage Users
@@ -176,7 +224,7 @@ To add a user using a YAML file::
 To amend a status of the user::
 
     * User will be in pending state by default
-    * The commands to change the user status are self explanatory
+    * The commands to change the user status are cls explanatory
 
 
 .. note::
@@ -260,9 +308,14 @@ To import data from json file into a database::
 Yet to be done
 ==============
 
+**Notification Mechanisms**
+    When the user applies for an account/project, notification needs to be put in place to let the admin/reviewer know about the pending account/project request.
+
+**Authentication**
+    Authentication is yet to be done
+
 **Add users in Bulk**
     At the moment, there is only an option to add single user from the yaml file. This needs to be extended to cover multiple users.
-
 
 **Start mongo if mongo is not running while using the "cm management" commands**
     The file mongo.py has the code that is taken from mongo.py under **fabfile** directory in cloudmesh. This has three

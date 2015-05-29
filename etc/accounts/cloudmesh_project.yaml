@@ -32,6 +32,11 @@ cloudmesh:
                 type: list
                 required: True
                 reference: user
+            - reviewers:
+                label: Project Reviewers
+                type: list
+                required: True
+                reference: user
             - alumnis:
                 label: Project Alumni
                 type: list

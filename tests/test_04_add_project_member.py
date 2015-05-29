@@ -4,6 +4,7 @@ from cloudmesh_management.base_user import User
 from cloudmesh_management.base_project import Project
 
 from cloudmesh_management.project import Projects
+from cloudmesh_management.mongo import Mongo
 
 
 class TestAddProjectMember:
@@ -15,6 +16,8 @@ class TestAddProjectMember:
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
             meta = {'db_alias': db_name}
+        obj = Mongo()
+        obj.check_mongo()
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
 

@@ -1,8 +1,8 @@
-import datetime, time
-from mongoengine import Document
+import datetime
+
 from mongoengine import *
-from mongoengine import fields
 import mongoengine
+
 
 duration_in_weeks = 24
 

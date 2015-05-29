@@ -2,10 +2,15 @@
 
 import os
 import shutil
+import yaml
 
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 from cmd3.console import Console
+from passlib.hash import sha256_crypt
+from cloudmesh_management.user import Users
+from cloudmesh_management.base_user import User
+from cloudmesh_database.dbconn import get_mongo_db, DBConnFactory
 
 
 try:
@@ -19,6 +24,7 @@ from cloudmesh_base.Shell import Shell
 from cloudmesh_base.util import auto_create_version
 from cloudmesh_base.util import auto_create_requirements
 from cloudmesh_management.class_generator import SourceCode
+from cloudmesh_management.mongo import Mongo
 
 version = "1.1"
 
@@ -99,6 +105,42 @@ class ReGenFile(install):
             SourceCode.parse(class_type=item)
 
 
+class SetupSuperUser(install):
+    def run(self):
+        obj = Mongo()
+        obj.check_mongo()
+        get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
+        banner("Adding Super User")
+        users = Users()
+        found = User.objects(username='super')
+        if not found:
+            data = User(
+                status="approved",
+                title="None",
+                firstname="Super",
+                lastname="User",
+                email="laszewski@gmail.com",
+                username="super",
+                active=True,
+                password=sha256_crypt.encrypt("MyPassword"),
+                phone="555-555-5555",
+                department="IT",
+                institution="IU",
+                institutionrole="Other",
+                address="IU",
+                country="United States(US)",
+                citizenship="United States(US)",
+                bio="Manage Project Committee",
+                url="http://cloudmesh.github.io/cloudmesh.html",
+                advisor="None",
+                confirm=sha256_crypt.encrypt("MyPassword"),
+                projects=[],
+            )
+            users.add(data)
+            users.set_role('admin')
+            users.set_role('reviewer')
+
+
 
 # class SetupYaml(install):
 #     """Copies a management yaml file to ~/.cloudmesh."""
@@ -143,8 +185,39 @@ class RegisterWithPypi(install):
 class InstallBase(install):
     """Install the package."""
     def run(self):
-        banner("Install Cloudmesh Base")
+        banner("Install Cloudmesh Management")
+        obj = Mongo()
+        obj.check_mongo()
+        get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         install.run(self)
+        banner("Adding Super User")
+        users = Users()
+        found = User.objects(username='super')
+        if not found:
+            data = User(
+                status="approved",
+                title="None",
+                firstname="Super",
+                lastname="User",
+                email="laszewski@gmail.com",
+                username="super",
+                active=True,
+                password=sha256_crypt.encrypt("MyPassword"),
+                phone="555-555-5555",
+                department="IT",
+                institution="IU",
+                institutionrole="Other",
+                address="IU",
+                country="United States(US)",
+                citizenship="United States(US)",
+                bio="Manage Project Committee",
+                url="http://cloudmesh.github.io/cloudmesh.html",
+                advisor="None",
+                confirm=sha256_crypt.encrypt("MyPassword"),
+                projects=[],
+            )
+            users.add(data)
+
 
 
 class InstallRequirements(install):
@@ -202,6 +275,7 @@ setup(
         'yaml': SetupYaml,
         'resetyaml': ResetYaml,
         'regenfile': ReGenFile,
+        'setupsuperuser': SetupSuperUser,
         },
 )
 

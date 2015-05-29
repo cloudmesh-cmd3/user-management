@@ -4,12 +4,23 @@
 """
 
 import yaml
+from cloudmesh_database.dbconn import get_mongo_dbname_from_collection, get_mongo_db, DBConnFactory
 from cloudmesh_base.locations import config_file
+from cloudmesh_base.util import path_expand
+from cloudmesh_management.base_user import User
+from cmd3.console import Console
+from functools import wraps
+from cloudmesh_management.mongo import Mongo
+from cloudmesh_base.util import banner
 
 DB_CLASS_FIELDS = ""
 DB_CLASS_DICT = {}
 UI_CLASS_FIELDS = ""
 KEYS = "keys = ["
+
+
+def implement():
+    print "Yet to be implemented."
 
 
 def build_db_field(item):
@@ -204,8 +215,74 @@ def project_fields():
     return fields
 
 
+def get_current_user():
+    filename = path_expand("~/.cloudmesh/{0}/{1}".format("accounts", ".config"))
+    with open(filename, 'r') as yamlfile:
+        cfg = yaml.load(yamlfile)
+        username = cfg['user']
+    return username
+
+
+def get_current_user_role():
+    filename = path_expand("~/.cloudmesh/{0}/{1}".format("accounts", ".config"))
+    with open(filename, 'r') as yamlfile:
+        cfg = yaml.load(yamlfile)
+        username = cfg['user']
+    db_name = get_mongo_dbname_from_collection("manage")
+    if db_name:
+        meta = {'db_alias': db_name}
+    ##
+    ##
+    obj = Mongo()
+    obj.check_mongo()
+    ##
+    ##
+    get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
+    found = User.objects(username=username).only('roles').first()
+    return found.roles
+    pass
+
+def error_response():
+    Console.error("You are not authorized to access the resource.")
+    pass
+
+
+def requires_roles(*roles):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            authorized = False
+            user_roles = get_current_user_role()
+            for item in user_roles:
+                if item in roles:
+                    authorized = authorized or True
+                else:
+                    authorized = authorized or False
+            if not authorized:
+                return error_response()
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+@requires_roles('admin')
+def notify_user(username, message):
+    print "Message to be sent: {0}".format(message)
+    pass
+
+
+# def requires_roles(*roles):
+#     def wrapper(f):
+#         @wraps(f)
+#         def wrapped(*args, **kwargs):
+#             if get_current_user_role() not in roles:
+#                 return error_response()
+#             return f(*args, **kwargs)
+#         return wrapped
+#     return wrapper
+
 if __name__ == '__main__':
     # country_list()
     # user_fields()
     # states_list()
-    disciplines_list()
+    # disciplines_list()
+    notify_user("donny", "Test Message")

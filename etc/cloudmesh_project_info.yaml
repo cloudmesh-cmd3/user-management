@@ -8,6 +8,7 @@ cloudmesh:
         lead:
         managers:
         members:
+        reviewers:
         keywords: sqllite
         alumnis: "user1, user2, user3"
         contact: "SOIC, IU"

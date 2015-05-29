@@ -3,6 +3,7 @@ from cloudmesh_management.user import User
 from cloudmesh_base.util import HEADING
 from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 
+from cloudmesh_management.mongo import Mongo
 from cloudmesh_management.user import Users
 
 
@@ -14,6 +15,8 @@ class TestAddUserFromFile:
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
             meta = {'db_alias': db_name}
+        obj = Mongo()
+        obj.check_mongo()
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
 

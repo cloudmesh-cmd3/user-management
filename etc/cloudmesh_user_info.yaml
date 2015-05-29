@@ -3,8 +3,8 @@ meta:
     kind: management
 cloudmesh:
     user:
-        username: abc
-        email: abc@indiana.edu
+        username: abc3
+        email: abc1@indiana.edu
         title: Mr.
         firstname: Abc
         lastname: Def
@@ -18,4 +18,5 @@ cloudmesh:
         address: Indiana University, Bloomington
         advisor: TBD
         country: United States(US)
+
 

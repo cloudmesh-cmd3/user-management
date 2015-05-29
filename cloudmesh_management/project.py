@@ -13,6 +13,9 @@ from bson.objectid import ObjectId
 from cloudmesh_management.base_project import Project
 from cloudmesh_management.base_user import User
 from mongoengine import fields
+from util import requires_roles
+from cloudmesh_management.mongo import Mongo
+from cloudmesh_base.util import banner
 
 ROLES_LIST = ["lead", "member", "alumni"]
 
@@ -54,6 +57,8 @@ class Projects(object):
     """
 
     def __init__(self):
+        obj = Mongo()
+        obj.check_mongo()
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         self.projects = Project.objects()
         self.users = User.objects()
@@ -76,6 +81,7 @@ class Projects(object):
         return Project.objects()
 
     @classmethod
+    @requires_roles('admin')
     def save(cls, project):
         """
         Adds a project to the database but only after it has been verified
@@ -86,6 +92,7 @@ class Projects(object):
         project.save()
 
     @classmethod
+    @requires_roles('admin')
     def add_user(cls, user_name, project_id, role):
         """
         Adds a member to the project.
@@ -124,6 +131,7 @@ class Projects(object):
             Console.error("The project `{0}` is not registered with Future Systems".format(project_id))
 
     @classmethod
+    @requires_roles('admin')
     def remove_user(cls, user_name, project_id, role):
         if role not in ROLES_LIST:
             Console.error("Invalid role `{0}`".format(role))
@@ -144,6 +152,7 @@ class Projects(object):
 
 
     @classmethod
+    @requires_roles('admin')
     def find_users(cls, project, role):
         '''returns all the members of a particular project
 
@@ -163,6 +172,7 @@ class Projects(object):
             return project.alumni
 
     @classmethod
+    @requires_roles('admin')
     def find_by_id(cls, id):
         '''
         finds projects by if
@@ -194,6 +204,7 @@ class Projects(object):
             return None
 
     @classmethod
+    @requires_roles('admin')
     def find_by_keyword(cls, keyword):
         '''
         finds a projects matching a keyword
@@ -209,6 +220,7 @@ class Projects(object):
             return None
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def add(cls, project):
         """
         Adds a project
@@ -227,6 +239,7 @@ class Projects(object):
 
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def create_project_from_file(cls, file_path):
         # implement()
         # return
@@ -262,6 +275,7 @@ class Projects(object):
         return split_list
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def list_projects(cls, display_fmt=None, project_id=None):
         req_fields = ["title", "status", "lead", "managers", "members", "project_id"]
         try:
@@ -287,6 +301,7 @@ class Projects(object):
 
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def display_two_column(cls, table_dict=None):
         if table_dict:
             ignore_fields = ['_cls', '_id', 'date_modified', 'date_created']
@@ -363,6 +378,7 @@ class Projects(object):
     #     pass
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def display(cls, project_dicts=None, project_id=None):
         if bool(project_dicts):
             values = []
@@ -427,6 +443,7 @@ class Projects(object):
                 Console.error("No project in the system with name '{0}'".format(project_id))
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def display_json(cls, project_dict=None, project_id=None):
         if bool(project_dict):
             # pprint.pprint(user_json)
@@ -437,12 +454,14 @@ class Projects(object):
 
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def clear(cls):
         """removes all projects from the database"""
         for project in Project.objects:
             project.delete()
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def delete_project(cls, project_id=None):
         if project_id:
             try:
@@ -458,6 +477,7 @@ class Projects(object):
             Console.error("Please specify the project to be removed")
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def amend_project_status(cls, project_id=None, new_status=None):
         current_status = ""
         if project_id:
@@ -490,6 +510,7 @@ class Projects(object):
             Console.error("Please specify the project to be amended")
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def get_project_status(cls, project_id):
         if project_id:
             try:
@@ -504,6 +525,7 @@ class Projects(object):
 
 
     @classmethod
+    @requires_roles('admin', 'reviewer')
     def set_project_status(cls, project_id, status):
         if project_id:
             try:
@@ -512,3 +534,39 @@ class Projects(object):
                 Console.error("Oops! Something went wrong while trying to amend project status")
         else:
             Console.error("Please specify the project to be amended")
+
+
+    @classmethod
+    @requires_roles('admin', 'reviewer')
+    def add_project_reviewer(cls, project_id, username):
+        if project_id:
+            try:
+                found = User.objects(username=username)
+                if found.count() > 0:
+                    Project.objects(project_id=project_id).update_one(push__reviewers=username)
+                    Console.info("User `{0}` added as Reviewer.".format(username))
+                else:
+                    Console.error("Please specify a valid user")
+            except:
+                Console.error("Oops! Something went wrong while trying to add project reviewer")
+        else:
+            Console.error("Please specify the project to be amended")
+
+
+    @classmethod
+    @requires_roles('admin', 'reviewer')
+    def remove_project_reviewer(cls, project_id, username):
+        if project_id:
+            try:
+                found = User.objects(username=username)
+                if found.count() > 0:
+                    Project.objects(project_id=project_id).update_one(pull__reviewers=username)
+                    Console.info("User `{0}` removed as Reviewer.".format(username))
+                else:
+                    Console.error("Please specify a valid user")
+            except:
+                Console.error("Oops! Something went wrong while trying to remove project reviewer")
+        else:
+            Console.error("Please specify the project to be amended")
+
+

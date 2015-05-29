@@ -1,8 +1,10 @@
 import json
 import sys
-import yaml
+import os
 
-from cloudmesh_database.dbconn import get_mongo_dbname_from_collection, get_mongo_db, DBConnFactory
+import yaml
+from cloudmesh_base.Shell import Shell
+from cloudmesh_database.dbconn import get_mongo_dbname_from_collection
 from cloudmesh_base.ConfigDict import ConfigDict
 from cloudmesh_base.util import path_expand
 from cmd3.console import Console
@@ -10,6 +12,8 @@ from passlib.hash import sha256_crypt
 from bson.objectid import ObjectId
 from texttable import Texttable
 from mongoengine import fields
+from util import requires_roles
+
 
 
 # from cloudmesh_management.base_classes import SubUser, Project
@@ -17,6 +21,7 @@ from cloudmesh_management.base_user import User
 from cloudmesh_management.base_project import Project
 
 STATUS = ('pending', 'approved', 'blocked', 'denied', 'active', 'suspended')
+ROLE = ('user', 'admin', 'reviewer')
 
 
 def implement():
@@ -134,6 +139,21 @@ class Users(object):
         return new_proposal
 
     @classmethod
+    @requires_roles('user', 'admin', 'reviewer')
+    def create_config(cls, username):
+        dir_path = path_expand("~/.cloudmesh/{0}".format("accounts"))
+
+        if not os.path.exists(dir_path):
+            Shell.mkdir(dir_path)
+
+        filename = path_expand("~/.cloudmesh/{0}/{1}".format("accounts", ".config"))
+        data = dict(user=username)
+
+        with open(filename, 'w') as outfile:
+            outfile.write(yaml.dump(data, default_flow_style=True))
+
+    @classmethod
+    @requires_roles('admin')
     def add(cls, user):
         """
         Adds a user
@@ -142,6 +162,7 @@ class Users(object):
         :type user: User object
         """
         user.username = cls.get_unique_username(user.username)
+        user.roles = ['user']
         user.set_date_deactivate()
         if cls.validate_email(user.email):
             user.save()
@@ -149,13 +170,15 @@ class Users(object):
             Console.error("A user with the e-mail `{0}` already exists".format(user.email))
 
     @classmethod
+    @requires_roles('admin')
     def delete_user(cls, user_name=None):
         if user_name:
             try:
                 user = User.objects(username=user_name)
                 if user:
                     user.delete()
-                    Console.info("User " + user_name + " removed from the database.")
+                    if user_name != "super":
+                        Console.info("User " + user_name + " removed from the database.")
                 else:
                     Console.error("User with the name '{0}' does not exist.".format(user_name))
             except:
@@ -164,6 +187,7 @@ class Users(object):
             Console.error("Please specify the user to be removed")
 
     @classmethod
+    @requires_roles('admin')
     def amend_user_status(cls, user_name=None, new_status=None):
         current_status = ""
         if user_name:
@@ -201,6 +225,7 @@ class Users(object):
             Console.error("Please specify the user to be amended")
 
     @classmethod
+    @requires_roles('admin')
     def set_user_status(cls, user_name, status):
         if user_name:
             try:
@@ -211,6 +236,7 @@ class Users(object):
             Console.error("Please specify the user to be amended")
 
     @classmethod
+    @requires_roles('admin')
     def get_user_status(cls, user_name):
         if user_name:
             try:
@@ -226,6 +252,7 @@ class Users(object):
             Console.error("Please specify the user get status")
 
     @classmethod
+    @requires_roles('admin')
     def validate_email(cls, email):
 
         """
@@ -238,6 +265,7 @@ class Users(object):
         return valid
 
     @classmethod
+    @requires_roles('admin')
     def find(cls, email=None):
         """
         Returns the users based on the given query.
@@ -257,6 +285,7 @@ class Users(object):
                 return None
 
     @classmethod
+    @requires_roles('admin')
     def find_user(cls, username):
         """
         Returns a user based on the username
@@ -267,6 +296,7 @@ class Users(object):
         return User.object(username=username)
 
     @classmethod
+    @requires_roles('admin')
     def clear(cls):
         """
         Removes all elements form the mongo db that are users
@@ -279,6 +309,7 @@ class Users(object):
             Console.error("Oops! Something went wrong while trying to clear the users from database")
 
     @classmethod
+    @requires_roles('admin')
     def list_users(cls, display_fmt=None, username=None):
         # req_fields = ["username", "title", "firstname", "lastname",
         # "email", "phone", "url", "citizenship",
@@ -286,7 +317,7 @@ class Users(object):
         #               "advisor", "address", "status", "projects"]
         req_fields = ["username", "firstname", "lastname",
                       "email", "phone", "institution", "institutionrole",
-                      "advisor", "address", "status", "projects"]
+                      "advisor", "address", "status", "projects", "roles"]
         try:
             if username is None:
                 user_json = User.objects.only(*req_fields).to_json()
@@ -313,7 +344,25 @@ class Users(object):
         except:
             Console.error("Oops.. Something went wrong in the list users method " + sys.exc_info()[0])
 
+
     @classmethod
+    @requires_roles('admin')
+    def list_users_json(cls):
+        # req_fields = ["username", "title", "firstname", "lastname",
+        # "email", "phone", "url", "citizenship",
+        #               "institution", "institutionrole", "department",
+        #               "advisor", "address", "status", "projects"]
+        req_fields = ["username", "firstname", "lastname",
+                      "email", "phone", "institution", "institutionrole",
+                      "advisor", "address", "status", "projects"]
+        try:
+                user_json = User.objects().to_json()
+                return user_json
+        except:
+            Console.error("Oops.. Something went wrong in the list users method " + sys.exc_info()[0])
+
+    @classmethod
+    @requires_roles('admin')
     def list_projects(cls, user_name=None):
         required_fields = ["username", "firstname", "lastname", "projects"]
         try:
@@ -328,6 +377,7 @@ class Users(object):
             Console.error("Please provide a username.")
 
     @classmethod
+    @requires_roles('admin')
     def display(cls, user_dicts=None, user_name=None):
         if bool(user_dicts):
             values = []
@@ -344,6 +394,13 @@ class Users(object):
                                                                                                   'project_id').first()
                                 project_entry = project_entry + user_project.title + ", "
                         items.append(project_entry)
+                    elif key == "roles":
+                        role_entry = ""
+                        if value:
+                            for itm in value:
+                                role_entry = role_entry+itm + ", "
+                            role_entry = role_entry.rstrip(', ')
+                        items.append(role_entry)
                     else:
                         items.append(value)
                     headers.append(key.replace('_', ' ').title())
@@ -356,6 +413,7 @@ class Users(object):
                 Console.error("No user in the system with name '{0}'".format(user_name))
 
     @classmethod
+    @requires_roles('admin')
     def display_two_columns(cls, table_dict=None):
         if table_dict:
             ignore_fields = ['_cls', '_id', 'date_modified', 'date_created', 'password', 'confirm']
@@ -390,6 +448,7 @@ class Users(object):
         pass
 
     @classmethod
+    @requires_roles('admin')
     def display_json(cls, user_dict=None, user_name=None):
         if bool(user_dict):
             print json.dumps(user_dict, indent=4)
@@ -398,6 +457,7 @@ class Users(object):
                 Console.error("No user in the system with name '{0}'".format(user_name))
 
     @classmethod
+    @requires_roles('admin')
     def create_user_from_file(cls, file_path):
         try:
             filename = path_expand(file_path)
@@ -429,10 +489,12 @@ class Users(object):
             return
 
     @classmethod
+    @requires_roles('admin')
     def check_exists(cls, user_name):
         return len(User.objects(username=user_name)) > 0
 
     @classmethod
+    @requires_roles('user', 'admin')
     def set_password(cls, user_name, passwd):
         pass_hash = sha256_crypt.encrypt(passwd)
         try:
@@ -440,6 +502,18 @@ class Users(object):
             Console.info("User password updated.")
         except:
             Console.error("Oops! Something went wrong while trying to set user password")
+
+    @classmethod
+    @requires_roles('admin', 'reviewer')
+    def set_role(cls, user_name, role):
+        try:
+            if role in ROLE:
+                User.objects(username=user_name).update_one(push__roles=role)
+                Console.info("Role {0} added to user {1}".format(role, user_name))
+            else:
+                Console.error("Please specify a valid role. Role {0} is invalid.".format(role))
+        except:
+            Console.error("Oops! Something went wrong while trying to set user role.")
 
 
 def verified_email_domain(email):

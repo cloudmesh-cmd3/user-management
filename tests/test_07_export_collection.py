@@ -1,9 +1,8 @@
 from cloudmesh_database.dbconn import get_mongo_db, get_mongo_dbname_from_collection, DBConnFactory
 from cloudmesh_base.util import HEADING
 
-from cloudmesh_management.generate import generate_users
-from cloudmesh_management.generate import generate_projects
 from cloudmesh_management.dbutil import DBUtil
+from cloudmesh_management.mongo import Mongo
 
 
 class TestExportCollection:
@@ -14,6 +13,8 @@ class TestExportCollection:
         db_name = get_mongo_dbname_from_collection("manage")
         if db_name:
             meta = {'db_alias': db_name}
+        obj = Mongo()
+        obj.check_mongo()
         get_mongo_db("manage", DBConnFactory.TYPE_MONGOENGINE)
         pass
 

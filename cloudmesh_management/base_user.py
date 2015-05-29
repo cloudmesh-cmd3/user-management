@@ -3,7 +3,6 @@ from cloudmesh_management.cloudmeshobject import CloudmeshObject
 from mongoengine import *
 
 
-
 class User(CloudmeshObject):
     db_name = get_mongo_dbname_from_collection("manage")
     if db_name:
@@ -14,6 +13,7 @@ class User(CloudmeshObject):
     """
     status = StringField(required=True, default='pending')
     userid = UUIDField()
+    roles = ListField(StringField())
     
     """
     User Fields
